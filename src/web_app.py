@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import os
 import json
 import queue
 import sys
 import threading
+from dataclasses import dataclass
 from pathlib import Path
 
 from flask import Flask, Response, render_template, request
@@ -45,6 +47,14 @@ UPLOAD_FOLDER = Path.cwd() / "data" / "uploads"
 UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
 
+@dataclass(frozen=True)
+class RunOptions:
+    chunk_size: int
+    chunk_overlap: int
+    skip_media: bool
+    summary_max_workers: int
+
+
 # ─── SSE helpers ────────────────────────────────────────────────────
 
 def _sse_event(data: dict) -> str:
@@ -55,10 +65,46 @@ def _emit(q: queue.Queue, step: str, status: str, message: str, percent: int) ->
     q.put({"step": step, "status": status, "message": message, "percent": percent})
 
 
+def _build_run_options(form) -> RunOptions:
+    fast_mode = form.get("fast_mode") == "on"
+    if fast_mode:
+        return RunOptions(
+            chunk_size=6000,
+            chunk_overlap=100,
+            skip_media=True,
+            summary_max_workers=max(2, _summary_max_workers(default=3)),
+        )
+    return RunOptions(
+        chunk_size=3000,
+        chunk_overlap=300,
+        skip_media=False,
+        summary_max_workers=1,
+    )
+
+
+def _summary_max_workers(default: int = 1) -> int:
+    raw = os.getenv("SUMMARY_MAX_WORKERS", "").strip()
+    if not raw:
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        return default
+    return max(1, value)
+
+
 # ─── Pipeline runner (runs in background thread) ────────────────────
 
-def _run_pipeline(q: queue.Queue, arxiv_id: str | None, pdf_url: str | None, local_file: Path | None, force: bool) -> None:
+def _run_pipeline(
+    q: queue.Queue,
+    arxiv_id: str | None,
+    pdf_url: str | None,
+    local_file: Path | None,
+    force: bool,
+    options: RunOptions | None = None,
+) -> None:
     try:
+        options = options or _build_run_options({})
         ensure_project_dirs()
         llm_config = load_llm_config()
         media_config = load_media_config()
@@ -91,7 +137,13 @@ def _run_pipeline(q: queue.Queue, arxiv_id: str | None, pdf_url: str | None, loc
 
         # Step 3 — Chunk
         markdown = read_text(markdown_path)
-        chunks = split_markdown(markdown, paper_id=paper.paper_id, source_file=str(markdown_path))
+        chunks = split_markdown(
+            markdown,
+            paper_id=paper.paper_id,
+            source_file=str(markdown_path),
+            chunk_size=options.chunk_size,
+            chunk_overlap=options.chunk_overlap,
+        )
         _emit(q, "文本分块", "done", f"切分为 {len(chunks)} 个片段", 45)
 
         # Step 4 — Summarize (use the existing module)
@@ -99,6 +151,7 @@ def _run_pipeline(q: queue.Queue, arxiv_id: str | None, pdf_url: str | None, loc
         summary_paths = summarize_chunks(
             chunks, paper_id=paper.paper_id, summary_dir=SUMMARY_DIR,
             map_prompt=map_prompt, llm_client=llm_client, force=force,
+            max_workers=options.summary_max_workers,
         )
         _emit(q, "LLM摘要", "done", f"全部 {len(chunks)} 个片段摘要完成", 75)
 
@@ -113,6 +166,15 @@ def _run_pipeline(q: queue.Queue, arxiv_id: str | None, pdf_url: str | None, loc
 
         image_path = None
         audio_path = None
+
+        if options.skip_media:
+            warnings.append("快速模式已跳过封面和音频生成")
+            _emit(q, "封面生成", "warning", "快速模式已跳过封面生成", 94)
+            _emit(q, "音频合成", "warning", "快速模式已跳过音频合成", 98)
+            payload = {"script": str(script_path), "warnings": warnings}
+            _emit(q, "完成", "done", json.dumps(payload, ensure_ascii=False), 100)
+            q.put(None)
+            return
 
         try:
             _emit(q, "封面生成", "running", "正在生成播客封面...", 92)
@@ -175,6 +237,7 @@ def api_run():
     arxiv_id = request.form.get("arxiv_id", "").strip() or None
     pdf_url = request.form.get("pdf_url", "").strip() or None
     force = request.form.get("force") == "on"
+    options = _build_run_options(request.form)
 
     local_file = None
     uploaded = request.files.get("local_pdf")
@@ -188,7 +251,7 @@ def api_run():
     q: queue.Queue = queue.Queue()
 
     def generate():
-        thread = threading.Thread(target=_run_pipeline, args=(q, arxiv_id, pdf_url, local_file, force), daemon=True)
+        thread = threading.Thread(target=_run_pipeline, args=(q, arxiv_id, pdf_url, local_file, force, options), daemon=True)
         thread.start()
         while True:
             try:

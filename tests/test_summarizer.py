@@ -1,4 +1,6 @@
 import tempfile
+import threading
+import time
 import unittest
 from pathlib import Path
 
@@ -93,6 +95,43 @@ class SummarizerTests(unittest.TestCase):
                 "first summary",
             )
             self.assertFalse((summary_dir / "2401.00000_chunk_002.md").exists())
+
+    def test_max_workers_summarizes_chunks_concurrently(self):
+        class SlowLlm:
+            def __init__(self):
+                self.active = 0
+                self.max_active = 0
+                self.lock = threading.Lock()
+
+            def chat(self, prompt):
+                with self.lock:
+                    self.active += 1
+                    self.max_active = max(self.max_active, self.active)
+                time.sleep(0.05)
+                with self.lock:
+                    self.active -= 1
+                return f"summary for {prompt}"
+
+        with tempfile.TemporaryDirectory() as tmp:
+            summary_dir = Path(tmp)
+            llm = SlowLlm()
+
+            paths = summarize_chunks(
+                [make_chunk(1, "first"), make_chunk(2, "second"), make_chunk(3, "third")],
+                paper_id="2401.00000",
+                summary_dir=summary_dir,
+                map_prompt="Summarize: {chunk}",
+                llm_client=llm,
+                force=True,
+                max_workers=3,
+            )
+
+            self.assertEqual(len(paths), 3)
+            self.assertGreaterEqual(llm.max_active, 2)
+            self.assertEqual(
+                (summary_dir / "2401.00000_chunk_002.md").read_text(encoding="utf-8"),
+                "summary for Summarize: second",
+            )
 
 
 if __name__ == "__main__":

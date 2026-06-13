@@ -186,6 +186,26 @@ body {
   color: var(--text);
 }
 
+.option-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border: 3px solid var(--border);
+  background: #fffdf9;
+  font-size: 0.68rem;
+  color: var(--text);
+  cursor: pointer;
+}
+.option-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+.option-toggle span {
+  line-height: 1.5;
+}
+
 /* ── Pixel Button ──────────────────────────────────── */
 .pixel-btn {
   padding: 0.7rem 1.6rem;
@@ -469,6 +489,10 @@ body {
         <input type="file" id="local-pdf" accept=".pdf">
         <label class="file-label" for="local-pdf" id="file-label">📂 或上传本地 PDF...</label>
       </div>
+      <label class="option-toggle" for="fast-mode">
+        <input type="checkbox" id="fast-mode">
+        <span>快速模式：更快生成脚本，跳过封面和音频</span>
+      </label>
       <button class="pixel-btn" id="btn-run" onclick="startPipeline()">
         ▶ 开始生成
       </button>
@@ -577,6 +601,7 @@ function startPipeline() {
   const pdfUrl = document.getElementById('pdf-url').value.trim();
   const fileInput = document.getElementById('local-pdf');
   const file = fileInput.files[0];
+  const fastMode = document.getElementById('fast-mode').checked;
 
   if (!arxivId && !pdfUrl && !file) {
     alert('请填写 arXiv ID、PDF URL 或上传 PDF 文件');
@@ -601,6 +626,7 @@ function startPipeline() {
   if (arxivId) formData.append('arxiv_id', arxivId);
   if (pdfUrl) formData.append('pdf_url', pdfUrl);
   if (file) formData.append('local_pdf', file);
+  if (fastMode) formData.append('fast_mode', 'on');
 
   // Close existing SSE
   if (eventSource) eventSource.close();

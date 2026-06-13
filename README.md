@@ -16,6 +16,7 @@ Copy `.env.example` to `.env` and fill in an OpenAI-compatible API:
 LLM_API_KEY=your_api_key_here
 LLM_BASE_URL=https://api.example.com/v1
 LLM_MODEL=deepseek-chat
+SUMMARY_MAX_WORKERS=3
 ```
 
 Optional Web media providers can be enabled in the same `.env` file:
@@ -30,6 +31,8 @@ COSYVOICE_VOICE=default
 ```
 
 Use `none` to disable either provider.
+
+The Web UI also includes a fast mode. It uses larger chunks, less overlap, parallel chunk summaries, and skips media generation so you can get a script sooner.
 
 ## Usage
 
