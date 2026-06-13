@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PaperCast Radio — 论文播客</title>
+<style>
+/* ── Pixel Font ─────────────────────────────────────── */
+@font-face {
+  font-family: 'Pixel';
+  src: url(data:font/woff2;base64,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) format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ── Reset & Base ──────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #fef7f0;
+  --card:      #fff8f3;
+  --primary:   #e8957c;
+  --secondary: #f4c7ab;
+  --accent:    #d4694a;
+  --text:      #4a3728;
+  --muted:     #b8937a;
+  --success:   #7cb88a;
+  --border:    #e0c8b5;
+  --pixel:     4px;
+}
+
+body {
+  font-family: 'Pixel', 'SimHei', '微软雅黑', monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background-image:
+    radial-gradient(circle, var(--secondary) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 8px 8px;
+}
+
+.container {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Pixel Card ────────────────────────────────────── */
+.pixel-card {
+  background: var(--card);
+  border: var(--pixel) solid var(--border);
+  box-shadow:
+    var(--pixel) var(--pixel) 0 0 rgba(180,140,110,0.25),
+    inset 0 0 0 2px rgba(255,255,255,0.5);
+  padding: 1.5rem;
+  position: relative;
+}
+
+/* ── Header ────────────────────────────────────────── */
+.header {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.header-icon {
+  font-size: 3rem;
+  image-rendering: pixelated;
+  display: block;
+  margin-bottom: 0.5rem;
+  animation: antenna-bounce 2s ease-in-out infinite;
+}
+
+@keyframes antenna-bounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.header h1 {
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-shadow: 2px 2px 0 var(--secondary);
+}
+
+.header .tagline {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 0.3rem;
+  letter-spacing: 1px;
+}
+
+/* ── Signal bars (pixel animation) ─────────────────── */
+.signal-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  justify-content: center;
+  height: 20px;
+  margin-top: 0.8rem;
+}
+.signal-bars span {
+  width: 6px;
+  background: var(--primary);
+  animation: signal 1s ease-in-out infinite;
+}
+.signal-bars span:nth-child(1) { height: 6px; animation-delay: 0s; }
+.signal-bars span:nth-child(2) { height: 12px; animation-delay: 0.1s; }
+.signal-bars span:nth-child(3) { height: 18px; animation-delay: 0.2s; }
+.signal-bars span:nth-child(4) { height: 14px; animation-delay: 0.3s; }
+.signal-bars span:nth-child(5) { height: 8px; animation-delay: 0.4s; }
+
+@keyframes signal {
+  0%,100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* ── Input Section ─────────────────────────────────── */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.input-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.pixel-input {
+  flex: 1;
+  min-width: 160px;
+  padding: 0.6rem 0.8rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  border: 3px solid var(--border);
+  background: #fffdf9;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.pixel-input:focus {
+  border-color: var(--primary);
+  box-shadow: 3px 3px 0 0 var(--secondary);
+}
+.pixel-input::placeholder {
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+/* ── Pixel File Upload ─────────────────────────────── */
+.file-upload-wrap {
+  position: relative;
+}
+.file-upload-wrap input[type=file] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.file-label {
+  display: block;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.7rem;
+  border: 3px dashed var(--border);
+  background: #fffdf9;
+  color: var(--muted);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.file-label:hover {
+  border-color: var(--primary);
+  color: var(--text);
+}
+.file-label.has-file {
+  border-style: solid;
+  border-color: var(--success);
+  color: var(--text);
+}
+
+/* ── Pixel Button ──────────────────────────────────── */
+.pixel-btn {
+  padding: 0.7rem 1.6rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  box-shadow: var(--pixel) var(--pixel) 0 0 var(--accent);
+  transition: all 0.1s;
+  text-transform: uppercase;
+  image-rendering: pixelated;
+}
+.pixel-btn:hover {
+  background: #eca389;
+  box-shadow: 2px 2px 0 0 var(--accent);
+  transform: translate(2px, 2px);
+}
+.pixel-btn:active {
+  box-shadow: 0 0 0 0 var(--accent);
+  transform: translate(var(--pixel), var(--pixel));
+}
+.pixel-btn:disabled {
+  background: var(--muted);
+  box-shadow: 2px 2px 0 0 #a08070;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pixel-btn.accent {
+  background: var(--accent);
+  box-shadow: var(--pixel) var(--pixel) 0 0 #a04030;
+}
+
+/* ── Progress Section ──────────────────────────────── */
+#progress-section {
+  display: none;
+}
+
+.step-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.7rem;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.step-item .icon {
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+}
+
+.step-item.waiting { color: var(--muted); }
+.step-item.waiting .icon::before { content: '⬜'; }
+.step-item.running { color: var(--accent); border-color: var(--secondary); background: #fffaf6; }
+.step-item.running .icon::before { content: '▶'; animation: blink 0.6s step-end infinite; }
+.step-item.done { color: var(--success); }
+.step-item.done .icon::before { content: '✅'; }
+.step-item.error { color: #d44; }
+.step-item.error .icon::before { content: '❌'; }
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Pixel progress bar */
+.progress-bar-outer {
+  margin-top: 0.8rem;
+  height: 14px;
+  border: 3px solid var(--border);
+  background: #fffdf9;
+  position: relative;
+}
+.progress-bar-inner {
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--primary) 0px,
+    var(--primary) 8px,
+    #f0a890 8px,
+    #f0a890 10px
+  );
+  width: 0%;
+  transition: width 0.3s step-end;
+}
+.progress-text {
+  font-size: 0.6rem;
+  color: var(--muted);
+  text-align: right;
+  margin-top: 0.2rem;
+}
+
+/* ── Output Section ────────────────────────────────── */
+#output-section {
+  display: none;
+}
+
+.script-content {
+  font-size: 0.75rem;
+  line-height: 1.8;
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 1rem;
+  border: 3px solid var(--border);
+  background: #fffdf9;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.script-content::-webkit-scrollbar {
+  width: 8px;
+}
+.script-content::-webkit-scrollbar-track {
+  background: var(--card);
+}
+.script-content::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border: 2px solid var(--card);
+}
+
+/* ── Audio Player ──────────────────────────────────── */
+#audio-section {
+  display: none;
+  margin-top: 1rem;
+}
+
+.audio-card {
+  border: 3px solid var(--border);
+  background: var(--card);
+  padding: 0.8rem 1rem;
+}
+
+.audio-card audio {
+  width: 100%;
+  height: 36px;
+  border-radius: 0;
+}
+
+.audio-label {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  color: var(--accent);
+}
+
+.audio-download {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.65rem;
+  color: var(--primary);
+  text-decoration: none;
+  border: 2px solid var(--primary);
+  padding: 0.3rem 0.8rem;
+  transition: all 0.1s;
+}
+.audio-download:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ── Tape animation ────────────────────────────────── */
+.tape-container {
+  display: none;
+  justify-content: center;
+  gap: 12px;
+  padding: 0.5rem;
+}
+.tape-container.active { display: flex; }
+
+.tape-reel {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--text);
+  border-radius: 50%;
+  position: relative;
+}
+.tape-reel::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.tape-reel.spin {
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Pixel confetti ────────────────────────────────── */
+.confetti-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 999;
+}
+.confetti-piece {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  animation: confetti-fall 2s ease-out forwards;
+}
+@keyframes confetti-fall {
+  0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ── Responsive ────────────────────────────────────── */
+@media (max-width: 500px) {
+  body { padding: 1rem 0.5rem; }
+  .pixel-card { padding: 1rem; }
+  .header h1 { font-size: 1.1rem; }
+  .pixel-btn { font-size: 0.7rem; padding: 0.6rem 1.2rem; }
+  .input-row { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="pixel-card header">
+    <span class="header-icon">🎙️</span>
+    <h1>PIXEL RADIO STUDIO</h1>
+    <p class="tagline">论文 → 中文播客脚本 · PaperCast Agent</p>
+    <div class="signal-bars">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="pixel-card" id="input-card">
+    <div class="input-group">
+      <div class="input-row">
+        <input class="pixel-input" id="arxiv-id" placeholder="🔬 arXiv ID (例: 2401.00000)">
+        <input class="pixel-input" id="pdf-url" placeholder="🔗 PDF URL">
+      </div>
+      <div class="file-upload-wrap">
+        <input type="file" id="local-pdf" accept=".pdf">
+        <label class="file-label" for="local-pdf" id="file-label">📂 或上传本地 PDF...</label>
+      </div>
+      <button class="pixel-btn" id="btn-run" onclick="startPipeline()">
+        ▶ 开始生成
+      </button>
+    </div>
+  </div>
+
+  <!-- Tape animation -->
+  <div class="tape-container" id="tape">
+    <div class="tape-reel spin"></div>
+    <div class="tape-reel spin"></div>
+  </div>
+
+  <!-- Progress -->
+  <div class="pixel-card" id="progress-section">
+    <h3 style="font-size:0.8rem;margin-bottom:0.8rem;letter-spacing:1px;">📻 生成进度</h3>
+    <div class="progress-bar-outer">
+      <div class="progress-bar-inner" id="progress-bar"></div>
+    </div>
+    <p class="progress-text" id="progress-text">0%</p>
+    <ul class="step-list" id="step-list"></ul>
+  </div>
+
+  <!-- Output -->
+  <div class="pixel-card" id="output-section">
+    <h3 style="font-size:0.8rem;margin-bottom:0.8rem;letter-spacing:1px;">📝 播客脚本</h3>
+    <div id="audio-section">
+      <div class="audio-card">
+        <div class="audio-label">🎧 播客音频</div>
+        <audio id="audio-player" controls></audio>
+        <a class="audio-download" id="audio-download" href="#" download>⬇ 下载 MP3</a>
+      </div>
+    </div>
+    <div class="script-content" id="script-content"></div>
+  </div>
+
+</div>
+
+<div class="confetti-container" id="confetti"></div>
+
+<script>
+const STEPS = [
+  { id: '输入解析',  label: '解析论文输入' },
+  { id: 'PDF下载',   label: '下载论文 PDF' },
+  { id: 'Markdown转换', label: 'PDF → Markdown 转换' },
+  { id: '文本分块',  label: '文本智能切分' },
+  { id: 'LLM摘要',   label: 'AI 逐段摘要' },
+  { id: '生成脚本',  label: '生成播客脚本' },
+  { id: '音频合成',  label: '合成语音音频' },
+];
+
+let eventSource = null;
+
+function initSteps() {
+  const list = document.getElementById('step-list');
+  list.innerHTML = STEPS.map(s =>
+    `<li class="step-item waiting" id="step-${s.id}"><span class="icon"></span>${s.label}</li>`
+  ).join('');
+}
+
+function updateStep(stepId, status) {
+  const el = document.getElementById('step-' + stepId);
+  if (!el) return;
+  el.className = 'step-item ' + status;
+}
+
+function setProgress(pct) {
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = pct + '%';
+}
+
+function showSection(id) {
+  document.getElementById(id).style.display = 'block';
+}
+
+function spawnConfetti() {
+  const container = document.getElementById('confetti');
+  const colors = ['#e8957c','#f4c7ab','#d4694a','#7cb88a','#f0c090','#e0b0c0'];
+  for (let i = 0; i < 40; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.animationDelay = Math.random() * 1 + 's';
+    piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    container.appendChild(piece);
+    setTimeout(() => piece.remove(), 3500);
+  }
+}
+
+function startPipeline() {
+  const arxivId = document.getElementById('arxiv-id').value.trim();
+  const pdfUrl = document.getElementById('pdf-url').value.trim();
+  const fileInput = document.getElementById('local-pdf');
+  const file = fileInput.files[0];
+
+  if (!arxivId && !pdfUrl && !file) {
+    alert('请填写 arXiv ID、PDF URL 或上传 PDF 文件');
+    return;
+  }
+
+  // Reset UI
+  initSteps();
+  setProgress(0);
+  showSection('progress-section');
+  document.getElementById('output-section').style.display = 'none';
+  document.getElementById('script-content').textContent = '';
+  document.getElementById('tape').classList.add('active');
+  document.getElementById('btn-run').disabled = true;
+
+  // Build form data
+  const formData = new FormData();
+  if (arxivId) formData.append('arxiv_id', arxivId);
+  if (pdfUrl) formData.append('pdf_url', pdfUrl);
+  if (file) formData.append('local_pdf', file);
+
+  // Close existing SSE
+  if (eventSource) eventSource.close();
+
+  eventSource = new EventSource('/api/run?' + new URLSearchParams({_cb: Date.now()}));
+
+  // POST to start pipeline
+  fetch('/api/run', { method: 'POST', body: formData })
+    .then(response => {
+      if (!response.ok) throw new Error('Server error');
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      function read() {
+        reader.read().then(({ done, value }) => {
+          if (done) {
+            document.getElementById('tape').classList.remove('active');
+            document.getElementById('btn-run').disabled = false;
+            return;
+          }
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                handleSSE(data);
+              } catch(e) {}
+            }
+          }
+          read();
+        });
+      }
+      read();
+    })
+    .catch(err => {
+      updateStep('错误', 'error');
+      document.getElementById('tape').classList.remove('active');
+      document.getElementById('btn-run').disabled = false;
+      alert('请求失败: ' + err.message);
+    });
+}
+
+function handleSSE(data) {
+  const { step, status, message, percent } = data;
+
+  if (step === '错误') {
+    updateStep(STEPS.find(s => s.status === 'running')?.id || '输入解析', 'error');
+    document.getElementById('tape').classList.remove('active');
+    document.getElementById('btn-run').disabled = false;
+    const scriptEl = document.getElementById('script-content');
+    scriptEl.textContent = '❌ 错误: ' + message;
+    showSection('output-section');
+    return;
+  }
+
+  if (step === '完成') {
+    updateStep('生成脚本', 'done');
+    setProgress(100);
+    document.getElementById('tape').classList.remove('active');
+    document.getElementById('btn-run').disabled = false;
+    showSection('output-section');
+    spawnConfetti();
+    // Parse completion data
+    try {
+      const paths = JSON.parse(message);
+      // Load script
+      fetch('/api/script?path=' + encodeURIComponent(paths.script))
+        .then(r => r.text())
+        .then(text => {
+          document.getElementById('script-content').textContent = text;
+        });
+      // Show audio
+      if (paths.audio) {
+        document.getElementById('audio-section').style.display = 'block';
+        document.getElementById('audio-player').src = '/api/audio?path=' + encodeURIComponent(paths.audio);
+        document.getElementById('audio-download').href = '/api/audio?path=' + encodeURIComponent(paths.audio);
+      }
+    } catch(e) {
+      // Fallback: old format (just a path string)
+      fetch('/api/script?path=' + encodeURIComponent(message))
+        .then(r => r.text())
+        .then(text => {
+          document.getElementById('script-content').textContent = text;
+        });
+    }
+    return;
+  }
+
+  updateStep(step, status);
+  setProgress(percent);
+
+  if (status === 'done') {
+    // Auto-complete all previous steps
+    let found = false;
+    for (const s of STEPS) {
+      if (s.id === step) { found = true; continue; }
+      if (!found) updateStep(s.id, 'done');
+    }
+  }
+}
+
+// File upload label update
+document.getElementById('local-pdf').addEventListener('change', function() {
+  const label = document.getElementById('file-label');
+  if (this.files[0]) {
+    label.textContent = '📂 ' + this.files[0].name;
+    label.classList.add('has-file');
+  } else {
+    label.textContent = '📂 或上传本地 PDF...';
+    label.classList.remove('has-file');
+  }
+});
+</script>
+</body>
+</html>

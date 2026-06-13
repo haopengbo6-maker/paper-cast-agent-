@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+data/pdfs/*
+data/markdown/*
+data/chunks/*
+data/summaries/*
+data/scripts/*
+!data/pdfs/.gitkeep
+!data/markdown/.gitkeep
+!data/chunks/.gitkeep
+!data/summaries/.gitkeep
+!data/scripts/.gitkeep
