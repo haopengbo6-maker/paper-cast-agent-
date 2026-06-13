@@ -16,16 +16,20 @@ if __package__ in (None, ""):
 
 from src.arxiv_client import resolve_paper_input, resolve_local_pdf
 from src.config import load_llm_config
+from src.image_generator import generate_cover_image
 from src.llm_client import OpenAICompatibleClient, retry_call
 from src.markdown_converter import convert_pdf_to_markdown
+from src.media_config import load_media_config
 from src.pdf_downloader import download_pdf
 from src.prompts import load_prompt
 from src.script_writer import write_script, validate_script_structure
-from src.tts import generate_audio
 from src.splitter import split_markdown
 from src.summarizer import summarize_chunks
+from src.voice_generator import generate_voice_audio
 from src.utils import (
+    AUDIO_DIR,
     CHUNK_DIR,
+    IMAGE_DIR,
     MARKDOWN_DIR,
     PDF_DIR,
     PROMPT_DIR,
@@ -57,9 +61,11 @@ def _run_pipeline(q: queue.Queue, arxiv_id: str | None, pdf_url: str | None, loc
     try:
         ensure_project_dirs()
         llm_config = load_llm_config()
+        media_config = load_media_config()
         llm_client = OpenAICompatibleClient(llm_config)
         map_prompt = load_prompt(PROMPT_DIR / "map_prompt.txt", required_placeholder="{chunk}")
         reduce_prompt = load_prompt(PROMPT_DIR / "reduce_prompt.txt", required_placeholder="{summaries}")
+        warnings: list[str] = []
 
         # Step 1 — Resolve input
         _emit(q, "输入解析", "running", "正在解析论文输入...", 5)
@@ -105,12 +111,51 @@ def _run_pipeline(q: queue.Queue, arxiv_id: str | None, pdf_url: str | None, loc
         )
         _emit(q, "生成脚本", "done", "播客脚本生成完毕!", 90)
 
-        # Step 6 — Generate audio
-        _emit(q, "音频合成", "running", "正在合成语音...", 93)
-        audio_path = generate_audio(script_path)
-        _emit(q, "音频合成", "done", str(audio_path), 97)
+        image_path = None
+        audio_path = None
 
-        _emit(q, "完成", "done", json.dumps({"script": str(script_path), "audio": str(audio_path)}), 100)
+        try:
+            _emit(q, "封面生成", "running", "正在生成播客封面...", 92)
+            image_path = generate_cover_image(
+                paper.paper_id,
+                script_path,
+                IMAGE_DIR,
+                media_config.image,
+                force=force,
+            )
+            if image_path:
+                _emit(q, "封面生成", "done", str(image_path), 94)
+            else:
+                _emit(q, "封面生成", "warning", "封面生成已禁用", 94)
+        except Exception as exc:
+            warning = f"封面生成失败: {exc}"
+            warnings.append(warning)
+            _emit(q, "封面生成", "warning", warning, 94)
+
+        try:
+            _emit(q, "音频合成", "running", "正在合成播报音频...", 96)
+            audio_path = generate_voice_audio(
+                paper.paper_id,
+                script_path,
+                AUDIO_DIR,
+                media_config.voice,
+                force=force,
+            )
+            if audio_path:
+                _emit(q, "音频合成", "done", str(audio_path), 98)
+            else:
+                _emit(q, "音频合成", "warning", "音频合成已禁用", 98)
+        except Exception as exc:
+            warning = f"音频合成失败: {exc}"
+            warnings.append(warning)
+            _emit(q, "音频合成", "warning", warning, 98)
+
+        payload = {"script": str(script_path), "warnings": warnings}
+        if image_path:
+            payload["image"] = str(image_path)
+        if audio_path:
+            payload["audio"] = str(audio_path)
+        _emit(q, "完成", "done", json.dumps(payload, ensure_ascii=False), 100)
         q.put(None)
 
     except Exception as exc:
@@ -178,6 +223,30 @@ def api_audio():
     if not p.exists():
         return "not found", 404
     return Response(p.read_bytes(), mimetype="audio/mpeg")
+
+
+@app.route("/api/image")
+def api_image():
+    path = request.args.get("path", "")
+    if not path:
+        return "missing path", 400
+    try:
+        p = _safe_output_path(path, IMAGE_DIR)
+    except PermissionError:
+        return "forbidden", 403
+    except FileNotFoundError:
+        return "not found", 404
+    return Response(p.read_bytes(), mimetype="image/png")
+
+
+def _safe_output_path(path_text: str, allowed_dir: Path) -> Path:
+    path = Path(path_text).resolve()
+    allowed = allowed_dir.resolve()
+    if allowed not in path.parents and path != allowed:
+        raise PermissionError("path outside allowed output directory")
+    if not path.exists():
+        raise FileNotFoundError(path)
+    return path
 
 
 if __name__ == "__main__":

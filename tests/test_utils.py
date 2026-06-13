@@ -18,11 +18,26 @@ class UtilsTests(unittest.TestCase):
                 root / "data" / "chunks",
                 root / "data" / "summaries",
                 root / "data" / "scripts",
+                root / "data" / "images",
+                root / "data" / "audio",
                 root / "prompts",
             ]
             self.assertEqual(paths, expected)
             for path in expected:
                 self.assertTrue(path.exists(), f"{path} should exist")
+
+    def test_ensure_project_dirs_includes_media_dirs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            paths = ensure_project_dirs(root)
+
+            expected = {
+                root / "data" / "images",
+                root / "data" / "audio",
+            }
+            self.assertTrue(expected.issubset(set(paths)))
+            for path in expected:
+                self.assertTrue(path.is_dir())
 
 
 if __name__ == "__main__":

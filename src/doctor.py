@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .config import load_llm_config
+from .media_config import load_media_config
 from .prompts import load_prompt
 from .utils import ensure_project_dirs
 
@@ -40,6 +41,26 @@ def run_doctor(root: Path, check_optional_imports: bool = True) -> DoctorReport:
     try:
         load_llm_config(root / ".env")
         messages.append("LLM config found")
+    except Exception as exc:
+        errors.append(str(exc))
+
+    try:
+        media_config = load_media_config(root / ".env")
+        if media_config.image.enabled:
+            if media_config.image.base_url:
+                messages.append(f"Image provider configured: {media_config.image.provider}")
+            else:
+                errors.append("COMFYUI_BASE_URL is required when MEDIA_IMAGE_PROVIDER=comfyui")
+        else:
+            messages.append("Image provider disabled")
+
+        if media_config.voice.enabled:
+            if media_config.voice.base_url:
+                messages.append(f"Voice provider configured: {media_config.voice.provider}")
+            else:
+                errors.append("COSYVOICE_BASE_URL is required when MEDIA_VOICE_PROVIDER=cosyvoice")
+        else:
+            messages.append("Voice provider disabled")
     except Exception as exc:
         errors.append(str(exc))
 

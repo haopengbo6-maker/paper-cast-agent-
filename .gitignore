@@ -9,8 +9,12 @@ data/markdown/*
 data/chunks/*
 data/summaries/*
 data/scripts/*
+data/images/*
+data/audio/*
 !data/pdfs/.gitkeep
 !data/markdown/.gitkeep
 !data/chunks/.gitkeep
 !data/summaries/.gitkeep
 !data/scripts/.gitkeep
+!data/images/.gitkeep
+!data/audio/.gitkeep

@@ -319,13 +319,17 @@ body {
   border: 2px solid var(--card);
 }
 
-/* ── Audio Player ──────────────────────────────────── */
-#audio-section {
+/* ── Media Output ──────────────────────────────────── */
+#audio-section,
+#image-section,
+#warning-section {
   display: none;
   margin-top: 1rem;
 }
 
-.audio-card {
+.audio-card,
+.image-card,
+.warning-card {
   border: 3px solid var(--border);
   background: var(--card);
   padding: 0.8rem 1rem;
@@ -337,14 +341,33 @@ body {
   border-radius: 0;
 }
 
-.audio-label {
+.audio-label,
+.image-label,
+.warning-label {
   font-size: 0.7rem;
   letter-spacing: 1px;
   margin-bottom: 0.5rem;
   color: var(--accent);
 }
 
-.audio-download {
+.cover-image {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  image-rendering: auto;
+  border: 3px solid var(--border);
+  background: #fffdf9;
+}
+
+.warning-card {
+  border-color: #d9a45f;
+  color: #8a5a21;
+  white-space: pre-wrap;
+}
+
+.audio-download,
+.image-download {
   display: inline-block;
   margin-top: 0.5rem;
   font-size: 0.65rem;
@@ -354,7 +377,8 @@ body {
   padding: 0.3rem 0.8rem;
   transition: all 0.1s;
 }
-.audio-download:hover {
+.audio-download:hover,
+.image-download:hover {
   background: var(--primary);
   color: #fff;
 }
@@ -470,11 +494,24 @@ body {
   <!-- Output -->
   <div class="pixel-card" id="output-section">
     <h3 style="font-size:0.8rem;margin-bottom:0.8rem;letter-spacing:1px;">📝 播客脚本</h3>
+    <div id="warning-section">
+      <div class="warning-card">
+        <div class="warning-label">⚠️ 媒体提示</div>
+        <div id="warning-content"></div>
+      </div>
+    </div>
+    <div id="image-section">
+      <div class="image-card">
+        <div class="image-label">🖼️ 播客封面</div>
+        <img class="cover-image" id="cover-image" alt="播客封面">
+        <a class="image-download" id="image-download" href="#" download>⬇ 下载封面</a>
+      </div>
+    </div>
     <div id="audio-section">
       <div class="audio-card">
         <div class="audio-label">🎧 播客音频</div>
         <audio id="audio-player" controls></audio>
-        <a class="audio-download" id="audio-download" href="#" download>⬇ 下载 MP3</a>
+        <a class="audio-download" id="audio-download" href="#" download>⬇ 下载音频</a>
       </div>
     </div>
     <div class="script-content" id="script-content"></div>
@@ -492,6 +529,7 @@ const STEPS = [
   { id: '文本分块',  label: '文本智能切分' },
   { id: 'LLM摘要',   label: 'AI 逐段摘要' },
   { id: '生成脚本',  label: '生成播客脚本' },
+  { id: '封面生成',  label: '生成播客封面' },
   { id: '音频合成',  label: '合成语音音频' },
 ];
 
@@ -550,6 +588,10 @@ function startPipeline() {
   setProgress(0);
   showSection('progress-section');
   document.getElementById('output-section').style.display = 'none';
+  document.getElementById('warning-section').style.display = 'none';
+  document.getElementById('image-section').style.display = 'none';
+  document.getElementById('audio-section').style.display = 'none';
+  document.getElementById('warning-content').textContent = '';
   document.getElementById('script-content').textContent = '';
   document.getElementById('tape').classList.add('active');
   document.getElementById('btn-run').disabled = true;
@@ -627,6 +669,15 @@ function handleSSE(data) {
     // Parse completion data
     try {
       const paths = JSON.parse(message);
+      if (paths.warnings && paths.warnings.length) {
+        document.getElementById('warning-section').style.display = 'block';
+        document.getElementById('warning-content').textContent = paths.warnings.join('\n');
+      }
+      if (paths.image) {
+        document.getElementById('image-section').style.display = 'block';
+        document.getElementById('cover-image').src = '/api/image?path=' + encodeURIComponent(paths.image);
+        document.getElementById('image-download').href = '/api/image?path=' + encodeURIComponent(paths.image);
+      }
       // Load script
       fetch('/api/script?path=' + encodeURIComponent(paths.script))
         .then(r => r.text())

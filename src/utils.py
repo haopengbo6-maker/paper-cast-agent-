@@ -10,6 +10,8 @@ MARKDOWN_DIR = DATA_DIR / "markdown"
 SUMMARY_DIR = DATA_DIR / "summaries"
 SCRIPT_DIR = DATA_DIR / "scripts"
 CHUNK_DIR = DATA_DIR / "chunks"
+IMAGE_DIR = DATA_DIR / "images"
+AUDIO_DIR = DATA_DIR / "audio"
 PROMPT_DIR = PROJECT_ROOT / "prompts"
 
 
@@ -20,6 +22,8 @@ def ensure_project_dirs(root: Path = PROJECT_ROOT) -> list[Path]:
         root / "data" / "chunks",
         root / "data" / "summaries",
         root / "data" / "scripts",
+        root / "data" / "images",
+        root / "data" / "audio",
         root / "prompts",
     ]
     for path in paths:

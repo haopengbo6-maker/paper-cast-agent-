@@ -18,6 +18,19 @@ LLM_BASE_URL=https://api.example.com/v1
 LLM_MODEL=deepseek-chat
 ```
 
+Optional Web media providers can be enabled in the same `.env` file:
+
+```text
+MEDIA_IMAGE_PROVIDER=comfyui
+COMFYUI_BASE_URL=http://127.0.0.1:8188
+
+MEDIA_VOICE_PROVIDER=cosyvoice
+COSYVOICE_BASE_URL=http://127.0.0.1:50000
+COSYVOICE_VOICE=default
+```
+
+Use `none` to disable either provider.
+
 ## Usage
 
 ```bash
@@ -37,6 +50,8 @@ data/markdown/
 data/chunks/
 data/summaries/
 data/scripts/
+data/images/
+data/audio/
 ```
 
 Existing outputs are skipped by default. Use `--force` to regenerate.
@@ -91,6 +106,21 @@ The doctor check verifies local data directories, prompt placeholders, LLM envir
 ## Day 7 Demo
 
 See `docs/demo-day7.md` for the real-paper demo runbook: virtualenv setup, `.env` configuration, doctor checks, sample arXiv command, expected outputs, and resume behavior.
+
+## Web Media Providers
+
+PaperCast can call already-running local ComfyUI and CosyVoice services from the Web pipeline. PaperCast does not install models or start those services.
+
+For the first version, PaperCast expects simple adapter endpoints:
+
+```text
+POST {COMFYUI_BASE_URL}/papercast/txt2img
+POST {COSYVOICE_BASE_URL}/papercast/tts
+```
+
+The ComfyUI adapter endpoint should return PNG bytes. The CosyVoice adapter endpoint should return WAV bytes.
+
+If image or audio generation fails, the Web run still returns the generated script and shows a media warning.
 
 ## Test
 
