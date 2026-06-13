@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+.superpowers/
 data/pdfs/*
 data/markdown/*
 data/chunks/*
