@@ -1,6 +1,20 @@
 # PaperCast Agent
 
-PaperCast Agent is a Python CLI MVP that converts one arXiv paper or PDF URL into a Chinese podcast script.
+PaperCast Agent turns an arXiv paper, PDF URL, or local PDF into a Chinese paper podcast workflow. It can generate the script, optional cover art, and optional voice audio, then present the result in a local art-book style Web UI.
+
+The current visual direction is intentionally not photorealistic: covers are 2D research plates with colored-pencil sketching, messy construction lines, restrained acrylic/oil texture, paper grain, registration marks, and catalogue-like spacing.
+
+## Features
+
+- Resolve arXiv IDs, PDF URLs, or uploaded local PDFs.
+- Download and cache PDFs under `data/pdfs/`.
+- Convert PDFs to Markdown with MarkItDown.
+- Split long papers into resumable chunks.
+- Summarize chunks with an OpenAI-compatible LLM endpoint.
+- Reduce summaries into a structured Chinese podcast script.
+- Run a local Flask Web UI with fast mode and full mode.
+- Generate discipline-aware 2D cover images through a running ComfyUI instance.
+- Optionally synthesize audio through a local CosyVoice-compatible service.
 
 ## Install
 
@@ -10,7 +24,7 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Copy `.env.example` to `.env` and fill in an OpenAI-compatible API:
+Copy `.env.example` to `.env` and fill in your OpenAI-compatible LLM settings:
 
 ```text
 LLM_API_KEY=your_api_key_here
@@ -19,22 +33,28 @@ LLM_MODEL=deepseek-chat
 SUMMARY_MAX_WORKERS=3
 ```
 
-Optional Web media providers can be enabled in the same `.env` file:
+## Run The Web UI
 
-```text
-MEDIA_IMAGE_PROVIDER=comfyui
-COMFYUI_BASE_URL=http://127.0.0.1:8188
-
-MEDIA_VOICE_PROVIDER=cosyvoice
-COSYVOICE_BASE_URL=http://127.0.0.1:50000
-COSYVOICE_VOICE=default
+```bash
+python src/web_app.py
 ```
 
-Use `none` to disable either provider.
+Open the URL printed by Flask, usually:
 
-The Web UI also includes a fast mode. It uses larger chunks, less overlap, parallel chunk summaries, and skips media generation so you can get a script sooner.
+```text
+http://127.0.0.1:5000
+```
 
-## Usage
+The Web UI supports:
+
+- arXiv ID input
+- PDF URL input
+- local PDF upload
+- force regeneration
+- fast mode, which skips media generation and uses larger chunks
+- full mode, which runs cover and audio generation when providers are enabled
+
+## Run The CLI
 
 ```bash
 python src/main.py --version
@@ -45,49 +65,25 @@ python src/main.py --pdf-url "https://arxiv.org/pdf/2401.00000"
 python src/main.py --arxiv-id "2401.00000" --force
 ```
 
-Outputs are cached under `data/`:
-
-```text
-data/pdfs/
-data/markdown/
-data/chunks/
-data/summaries/
-data/scripts/
-data/images/
-data/audio/
-```
-
 Existing outputs are skipped by default. Use `--force` to regenerate.
 
-## Day 2 PDF And Markdown Handling
+## Output Files
 
-PDF files are downloaded to `data/pdfs/{paper_id}.pdf`. If the file already exists, the downloader skips the network request unless `--force` is used. Download failures include the URL, HTTP status when available, and the underlying reason.
-
-Markdown files are written to `data/markdown/{paper_id}.md`. Existing Markdown is skipped unless `--force` is used. The converter uses MarkItDown and fails clearly if the dependency is missing, conversion raises an error, or the generated Markdown is empty.
-
-## Day 3 Chunking
-
-Markdown is split into chunks with metadata for each segment. The CLI prints the chunk count and previews of the first two chunks, then writes debug artifacts to `data/chunks/`:
+Generated files are cached under `data/`:
 
 ```text
-data/chunks/{paper_id}_chunk_001.md
-data/chunks/{paper_id}_chunk_002.md
-data/chunks/{paper_id}_chunks.jsonl
+data/pdfs/        downloaded or uploaded PDFs
+data/markdown/    converted Markdown
+data/chunks/      split Markdown chunks and JSONL metadata
+data/summaries/   per-chunk map summaries
+data/scripts/     final Chinese podcast scripts
+data/images/      generated cover images
+data/audio/       generated audio files
 ```
 
-The JSONL file stores `paper_id`, `chunk_id`, `source_file`, and `char_length` for each chunk.
+## Script Format
 
-## Day 4 Map Summaries
-
-Each chunk is summarized independently and saved to `data/summaries/{paper_id}_chunk_001.md`. Existing summary files are skipped by default so failed runs can resume from the next missing chunk. Use `--force` to regenerate all summaries.
-
-If one chunk fails after retries, completed summary files stay on disk and the error message includes the failing chunk number. Prompt files are checked before model calls: `prompts/map_prompt.txt` must contain `{chunk}`, and `prompts/reduce_prompt.txt` must contain `{summaries}`.
-
-## Day 5 Reduce Script
-
-The reduce stage combines all chunk summaries into `data/scripts/{paper_id}_script.md`. Existing scripts are skipped by default and regenerated with `--force`.
-
-Before calling the model, the script writer checks that summary files exist and are not empty. After the model responds, the generated script must contain these sections before it is written:
+The final script is expected to include these sections:
 
 ```text
 # 播报标题
@@ -96,57 +92,109 @@ Before calling the model, the script writer checks that summary files exist and 
 # 适合延伸学习的概念
 ```
 
-## Day 6 Doctor Check
+The cover generator also reads the title, keywords, the first script paragraph, and the first summary cue so the visual concept can follow the actual paper instead of falling back to generic AI imagery.
 
-Run this before a real paper job:
+## ComfyUI Cover Generation
 
-```bash
-python src/main.py --doctor
-```
+PaperCast expects ComfyUI to already be running. It does not install ComfyUI or download checkpoint models.
 
-The doctor check verifies local data directories, prompt placeholders, LLM environment variables, and the MarkItDown dependency. It prints a report and exits non-zero if a required item is missing.
-
-## Day 7 Demo
-
-See `docs/demo-day7.md` for the real-paper demo runbook: virtualenv setup, `.env` configuration, doctor checks, sample arXiv command, expected outputs, and resume behavior.
-
-## Web Media Providers
-
-PaperCast can call already-running local ComfyUI and CosyVoice services from the Web pipeline. PaperCast does not install models or start those services.
-
-For the first version, PaperCast expects simple adapter endpoints:
+Enable image generation in `.env`:
 
 ```text
-POST {COMFYUI_BASE_URL}/papercast/txt2img
-POST {COSYVOICE_BASE_URL}/papercast/tts
+MEDIA_IMAGE_PROVIDER=comfyui
+COMFYUI_BASE_URL=http://127.0.0.1:8188
+COMFYUI_TIMEOUT_SECONDS=180
 ```
 
-The ComfyUI adapter endpoint should return PNG bytes. The CosyVoice adapter endpoint should return WAV bytes.
+The current implementation talks to ComfyUI's native endpoints:
 
-If image or audio generation fails, the Web run still returns the generated script and shows a media warning.
+```text
+GET  /object_info
+POST /prompt
+GET  /history/{prompt_id}
+GET  /view
+```
 
-## Test
+It selects the first available `CheckpointLoaderSimple` checkpoint from ComfyUI, builds a simple SDXL-style workflow, and saves the generated PNG under `data/images/` with a prompt-versioned filename such as:
+
+```text
+data/images/{paper_id}_cover_v10.png
+```
+
+The generated prompt is discipline-aware. It has explicit visual branches for topics such as:
+
+```text
+flow matching / generative modeling
+humanoid robotics
+computer vision
+large language models
+medicine and pathology
+physics
+materials science
+biology
+social science and economics
+climate and earth systems
+systems and networking
+control and reinforcement learning
+chemistry
+mathematics
+law
+energy systems
+agriculture
+```
+
+This is meant to produce meaningful, topic-specific 2D plates rather than random abstract images. A light Pillow post-process adds subtle paper grain and print finish after ComfyUI returns the image.
+
+## Voice Generation
+
+Enable voice generation in `.env` when you have a compatible local service running:
+
+```text
+MEDIA_VOICE_PROVIDER=cosyvoice
+COSYVOICE_BASE_URL=http://127.0.0.1:50000
+COSYVOICE_TIMEOUT_SECONDS=180
+COSYVOICE_VOICE=default
+```
+
+Use `MEDIA_IMAGE_PROVIDER=none` or `MEDIA_VOICE_PROVIDER=none` to disable either provider.
+
+If image or audio generation fails during a Web run, PaperCast still returns the generated script and displays a media warning.
+
+## Pipeline Notes
+
+- PDF downloads are cached and include clear errors for failed HTTP requests.
+- Markdown conversion fails clearly when MarkItDown is missing or produces empty output.
+- Chunk summaries are resumable; completed summary files stay on disk if a later chunk fails.
+- Prompt files are validated before model calls:
+  - `prompts/map_prompt.txt` must contain `{chunk}`.
+  - `prompts/reduce_prompt.txt` must contain `{summaries}`.
+- `python src/main.py --doctor` checks local directories, prompt placeholders, LLM environment variables, and dependencies.
+
+## Tests
 
 ```bash
 python -m unittest discover -s tests -v
+python -m unittest tests.test_image_generator -v
 python src/main.py --help
 ```
 
-## Day 1 Project Scaffold
+`tests.test_image_generator` covers the ComfyUI workflow builder, checkpoint selection, prompt-versioned output paths, and the discipline-aware cover prompt mapper.
 
-The project is intentionally split into small modules:
+## Project Structure
 
 ```text
 src/main.py                CLI and pipeline orchestration
+src/web_app.py             Flask Web UI and SSE pipeline runner
 src/config.py              .env loading and LLM config validation
-src/arxiv_client.py        arXiv ID / PDF URL resolution
+src/arxiv_client.py        arXiv ID / PDF URL / local PDF resolution
 src/pdf_downloader.py      PDF download and cache skip
 src/markdown_converter.py  MarkItDown conversion
 src/splitter.py            Markdown chunking
 src/llm_client.py          OpenAI-compatible chat client and retry helper
 src/summarizer.py          Map-stage chunk summaries
 src/script_writer.py       Reduce-stage final script
-src/utils.py               paths and file helpers
+src/image_generator.py     ComfyUI workflow and discipline-aware cover prompts
+src/voice_generator.py     Optional voice generation
+src/media_config.py        Media provider configuration
+tests/                     Unit tests
 ```
-
-CLI validation happens before network or model calls, so setup errors fail quickly.

@@ -192,12 +192,14 @@ def _run_pipeline(
 
         try:
             _emit(q, "封面生成", "running", "正在生成播客封面...", 92)
+            summary_hint = read_text(summary_paths[0]) if summary_paths else ""
             image_path = generate_cover_image(
                 output_id,
                 script_path,
                 IMAGE_DIR,
                 media_config.image,
                 force=force,
+                summary_hint=summary_hint,
             )
             if image_path:
                 _emit(q, "封面生成", "done", str(image_path), 94)
