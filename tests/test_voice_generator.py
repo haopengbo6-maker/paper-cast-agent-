@@ -53,6 +53,27 @@ class VoiceGeneratorTests(unittest.TestCase):
             self.assertEqual(calls[0][0], "http://voice/papercast/tts")
             self.assertEqual(calls[0][1]["voice"], "中文女声")
 
+    def test_writes_edge_tts_audio_bytes(self):
+        calls = []
+
+        def fake_edge_tts(text, output, voice, timeout):
+            calls.append((text, output, voice, timeout))
+            output.write_bytes(b"edge-audio")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = generate_voice_audio(
+                "paper",
+                "# 鎾姤鑴氭湰\n姝ｆ枃",
+                Path(tmp),
+                VoiceProviderConfig("edge_tts", "", 11, "zh-CN-XiaoxiaoNeural"),
+                request_audio=fake_edge_tts,
+                force=True,
+            )
+
+            self.assertEqual(path, Path(tmp) / "paper_podcast.mp3")
+            self.assertEqual(path.read_bytes(), b"edge-audio")
+            self.assertEqual(calls[0][2], "zh-CN-XiaoxiaoNeural")
+
 
 if __name__ == "__main__":
     unittest.main()

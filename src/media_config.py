@@ -49,9 +49,9 @@ def load_media_config(path: Path = Path(".env")) -> MediaConfig:
         ),
         voice=VoiceProviderConfig(
             provider=voice_provider,
-            base_url=_url("COSYVOICE_BASE_URL") if voice_provider != "none" else "",
+            base_url=_voice_base_url(voice_provider),
             timeout_seconds=_int("COSYVOICE_TIMEOUT_SECONDS", 180),
-            voice=os.getenv("COSYVOICE_VOICE", "default").strip() or "default",
+            voice=_voice_name(voice_provider),
         ),
     )
 
@@ -63,6 +63,18 @@ def _provider(name: str) -> str:
 
 def _url(name: str) -> str:
     return os.getenv(name, "").strip().rstrip("/")
+
+
+def _voice_base_url(provider: str) -> str:
+    if provider == "none" or provider == "edge_tts":
+        return ""
+    return _url("COSYVOICE_BASE_URL")
+
+
+def _voice_name(provider: str) -> str:
+    if provider == "edge_tts":
+        return os.getenv("EDGE_TTS_VOICE", "zh-CN-XiaoxiaoNeural").strip() or "zh-CN-XiaoxiaoNeural"
+    return os.getenv("COSYVOICE_VOICE", "default").strip() or "default"
 
 
 def _int(name: str, default: int) -> int:

@@ -3,446 +3,936 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PaperCast Radio — 论文播客</title>
+<title>PaperCast Radio | 论文电台</title>
 <style>
-/* ── Pixel Font ─────────────────────────────────────── */
-@font-face {
-  font-family: 'Pixel';
-  src: url(data:font/woff2;base64,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) format('woff2');
-  font-weight: normal;
-  font-style: normal;
-}
-
-/* ── Reset & Base ──────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; }
 
 :root {
-  --bg:        #fef7f0;
-  --card:      #fff8f3;
-  --primary:   #e8957c;
-  --secondary: #f4c7ab;
-  --accent:    #d4694a;
-  --text:      #4a3728;
-  --muted:     #b8937a;
-  --success:   #7cb88a;
-  --border:    #e0c8b5;
-  --pixel:     4px;
+  --page: #17110f;
+  --table: #3c281f;
+  --radio: #dec79b;
+  --radio-dark: #b99765;
+  --radio-line: #604431;
+  --ink: #251814;
+  --muted: #725946;
+  --accent: #a74632;
+  --accent-dark: #6d2e23;
+  --lcd: #b8c06f;
+  --lcd-dark: #263019;
+  --paper: #fff0cc;
+  --green: #496f4f;
+  --warn: #8d672d;
+  --radius: 8px;
+  --shadow: 10px 12px 0 #120c09;
 }
+
+html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Pixel', 'SimHei', '微软雅黑', monospace;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  padding: 2rem 1rem;
+  margin: 0;
+  min-height: 100dvh;
+  font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+  color: var(--paper);
+  background:
+    radial-gradient(circle at 12% 10%, rgb(167 70 50 / 0.18), transparent 28rem),
+    linear-gradient(180deg, #15100e 0%, var(--page) 58%, #241812 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38vh;
+  pointer-events: none;
+  background: var(--table);
+  border-top: 6px solid #221711;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
   background-image:
-    radial-gradient(circle, var(--secondary) 1px, transparent 1px);
-  background-size: 24px 24px;
-  background-position: 8px 8px;
+    linear-gradient(90deg, rgb(255 240 204 / 0.08) 1px, transparent 1px),
+    linear-gradient(rgb(255 240 204 / 0.05) 1px, transparent 1px);
+  background-size: 42px 42px;
 }
 
-.container {
-  width: 100%;
-  max-width: 720px;
+a { color: inherit; }
+button, input { font: inherit; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 10;
+  padding: 0.7rem 1rem;
+  background: var(--paper);
+  color: var(--ink);
+}
+.skip-link:focus { top: 1rem; }
+
+.radio-shell {
+  width: min(1240px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 64px;
+  position: relative;
+  z-index: 1;
+}
+
+.topbar {
+  min-height: 62px;
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #6a5141;
+  margin-bottom: 28px;
 }
 
-/* ── Pixel Card ────────────────────────────────────── */
-.pixel-card {
-  background: var(--card);
-  border: var(--pixel) solid var(--border);
-  box-shadow:
-    var(--pixel) var(--pixel) 0 0 rgba(180,140,110,0.25),
-    inset 0 0 0 2px rgba(255,255,255,0.5);
-  padding: 1.5rem;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #f2d9aa;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  color: #6b3b26;
+  background: #e9c989;
+  box-shadow: inset 0 -5px 0 #c39a5b;
+}
+
+.status-chip {
+  color: #e9d3aa;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.studio-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.72fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.readme-panel {
+  border: 3px solid #1d130f;
+  border-radius: 6px;
+  background: #3f2d23;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panel-tab {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  border-bottom: 3px solid #1d130f;
+  font-weight: 800;
+  background: #4f382a;
+}
+
+.panel-tab::before {
+  content: "";
+  width: 14px;
+  height: 18px;
+  border: 2px solid #dfc69a;
+  border-radius: 2px;
+  box-shadow: 6px 0 0 -2px #c9aa76;
+}
+
+.coffee-note {
+  margin: 22px 28px 0;
+  padding: 16px 18px;
+  border: 2px solid #6c503d;
+  border-radius: 4px;
+  background: #4b3529;
+  color: #f8e2bd;
+  line-height: 1.75;
+}
+
+.coffee-menu {
+  margin: 22px 28px 28px;
+  display: grid;
+  gap: 12px;
+}
+
+.menu-item {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 14px;
+  border: 2px solid #6c503d;
+  border-radius: 4px;
+  background: #4b3529;
+}
+
+.menu-index {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 4px;
+  background: #f2d7a6;
+  color: #563520;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-weight: 800;
+}
+
+.menu-item strong {
+  display: block;
+  color: #fff5df;
+  margin-bottom: 4px;
+}
+
+.menu-item span {
+  color: #dac29b;
+  line-height: 1.6;
+}
+
+.intro-copy {
+  padding: 22px 28px 0;
+  margin: 0;
+  font-size: clamp(1.02rem, 1.35vw, 1.32rem);
+  line-height: 1.8;
+  font-weight: 700;
+  color: #fff2d7;
+  max-width: 34em;
+  text-wrap: pretty;
+}
+
+.device {
+  margin: 24px;
+  border: 4px solid #1b120d;
+  border-radius: 6px;
+  background: var(--radio);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 3px #ead7b3, 10px 12px 0 #241710;
+  overflow: hidden;
   position: relative;
 }
 
-/* ── Header ────────────────────────────────────────── */
-.header {
+.device::before,
+.device::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #2a1d17;
+  border-radius: 50%;
+  background: #8b7353;
+  z-index: 2;
+}
+
+.device::before { left: 12px; top: 12px; }
+.device::after { right: 12px; bottom: 12px; }
+
+.device-head {
+  min-height: 86px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 22px;
+  border-bottom: 4px solid var(--radio-line);
+}
+
+.window-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.window-buttons::after {
+  content: "portable receiver";
+  margin-left: 8px;
+  color: #7b5c46;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 0.78rem;
+}
+
+.light {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #21150f;
+  box-shadow: inset 0 -2px 0 #7b2119;
+}
+.light.red { background: #d33b2e; }
+.light.yellow { background: #e4a62a; }
+.light.green { background: #36a461; }
+
+.device-logo {
   text-align: center;
-  padding: 2rem 1rem;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  line-height: 0.9;
+  font-weight: 850;
+  letter-spacing: -0.02em;
 }
 
-.header-icon {
-  font-size: 3rem;
-  image-rendering: pixelated;
+.device-logo span {
   display: block;
-  margin-bottom: 0.5rem;
-  animation: antenna-bounce 2s ease-in-out infinite;
+  margin-top: 8px;
+  color: #8b5036;
+  font-size: 0.68rem;
+  letter-spacing: 0.52em;
+  text-transform: uppercase;
 }
 
-@keyframes antenna-bounce {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+.control-room {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-bottom: 4px solid var(--radio-line);
 }
 
-.header h1 {
-  font-size: 1.4rem;
-  letter-spacing: 2px;
-  color: var(--accent);
-  text-shadow: 2px 2px 0 var(--secondary);
+.input-bay {
+  padding: 20px;
 }
 
-.header .tagline {
-  font-size: 0.7rem;
-  color: var(--muted);
-  margin-top: 0.3rem;
-  letter-spacing: 1px;
-}
-
-/* ── Signal bars (pixel animation) ─────────────────── */
-.signal-bars {
+.bay-label,
+.result-label {
   display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  justify-content: center;
-  height: 20px;
-  margin-top: 0.8rem;
-}
-.signal-bars span {
-  width: 6px;
-  background: var(--primary);
-  animation: signal 1s ease-in-out infinite;
-}
-.signal-bars span:nth-child(1) { height: 6px; animation-delay: 0s; }
-.signal-bars span:nth-child(2) { height: 12px; animation-delay: 0.1s; }
-.signal-bars span:nth-child(3) { height: 18px; animation-delay: 0.2s; }
-.signal-bars span:nth-child(4) { height: 14px; animation-delay: 0.3s; }
-.signal-bars span:nth-child(5) { height: 8px; animation-delay: 0.4s; }
-
-@keyframes signal {
-  0%,100% { opacity: 0.4; }
-  50% { opacity: 1; }
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
-/* ── Input Section ─────────────────────────────────── */
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
+.bay-label b,
+.result-label b {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 24px;
+  margin-right: 8px;
+  border-radius: 3px;
+  background: #5b3726;
+  color: var(--paper);
+}
+
+.tape-input {
+  border: 4px solid #241710;
+  border-radius: 5px;
+  background:
+    linear-gradient(180deg, #31221b, #231813),
+    #2b211b;
+  padding: 18px;
+  box-shadow: inset 0 0 0 3px #443127;
+}
+
+.input-grid {
+  display: grid;
+  gap: 14px;
 }
 
 .input-row {
-  display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
-.pixel-input {
-  flex: 1;
-  min-width: 160px;
-  padding: 0.6rem 0.8rem;
-  font-family: inherit;
-  font-size: 0.75rem;
-  border: 3px solid var(--border);
-  background: #fffdf9;
-  color: var(--text);
+.pixel-input,
+.file-label {
+  width: 100%;
+  min-height: 52px;
+  border: 2px solid #1b120d;
+  border-radius: 5px;
+  background: #fff8e8;
+  color: var(--ink);
+  padding: 0.85rem 1rem;
   outline: none;
-  transition: border-color 0.15s;
-}
-.pixel-input:focus {
-  border-color: var(--primary);
-  box-shadow: 3px 3px 0 0 var(--secondary);
-}
-.pixel-input::placeholder {
-  color: var(--muted);
-  font-size: 0.65rem;
+  box-shadow: inset 0 -3px 0 #e4d2ad;
 }
 
-/* ── Pixel File Upload ─────────────────────────────── */
-.file-upload-wrap {
-  position: relative;
+.pixel-input::placeholder { color: rgb(22 22 22 / 0.48); }
+.pixel-input:focus,
+.file-upload-wrap:focus-within .file-label {
+  box-shadow: 0 0 0 3px #a85b41;
 }
+
+.file-upload-wrap { position: relative; }
 .file-upload-wrap input[type=file] {
   position: absolute;
+  inset: 0;
   opacity: 0;
-  width: 100%;
-  height: 100%;
   cursor: pointer;
 }
 .file-label {
-  display: block;
-  padding: 0.6rem 0.8rem;
-  font-size: 0.7rem;
-  border: 3px dashed var(--border);
-  background: #fffdf9;
-  color: var(--muted);
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.file-label:hover {
-  border-color: var(--primary);
-  color: var(--text);
-}
-.file-label.has-file {
-  border-style: solid;
-  border-color: var(--success);
-  color: var(--text);
-}
-
-.option-toggle {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 0.7rem;
-  border: 3px solid var(--border);
-  background: #fffdf9;
-  font-size: 0.68rem;
-  color: var(--text);
   cursor: pointer;
+  color: #604b3a;
 }
-.option-toggle input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--accent);
+.file-label.has-file {
+  color: var(--ink);
+  border-bottom-color: var(--green);
 }
-.option-toggle span {
+
+.input-help {
+  margin: 0;
+  color: #cfb88d;
+  font-size: 0.88rem;
   line-height: 1.5;
 }
 
-/* ── Pixel Button ──────────────────────────────────── */
-.pixel-btn {
-  padding: 0.7rem 1.6rem;
-  font-family: inherit;
-  font-size: 0.8rem;
-  letter-spacing: 1px;
+.form-error {
+  min-height: 1.35rem;
+  margin: 0;
+  color: #ffd1bf;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.form-error:empty { display: none; }
+
+.mode-selector {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.mode-option {
+  position: relative;
+  min-width: 0;
   cursor: pointer;
-  border: none;
-  background: var(--primary);
-  color: #fff;
-  box-shadow: var(--pixel) var(--pixel) 0 0 var(--accent);
-  transition: all 0.1s;
-  text-transform: uppercase;
-  image-rendering: pixelated;
 }
-.pixel-btn:hover {
-  background: #eca389;
-  box-shadow: 2px 2px 0 0 var(--accent);
-  transform: translate(2px, 2px);
+.mode-option input {
+  position: absolute;
+  opacity: 0;
 }
+.mode-option span {
+  display: block;
+  min-height: 106px;
+  padding: 1rem;
+  border: 2px solid #1b120d;
+  border-radius: 5px;
+  background: #493227;
+  color: #e7d0a8;
+  line-height: 1.55;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+.mode-option strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #fff4dc;
+  font-size: 1rem;
+}
+.mode-option input:checked + span {
+  border-color: var(--accent);
+  background: #68402e;
+  color: #fff3d7;
+  box-shadow: inset 0 0 0 2px rgb(255 240 204 / 0.24);
+}
+.mode-option:hover span { transform: translateY(-1px); }
+.mode-option input:focus-visible + span {
+  outline: 3px solid #b35b40;
+  outline-offset: 3px;
+}
+
+.record-bay {
+  display: grid;
+  grid-template-columns: 96px minmax(160px, 1fr) 160px;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px 20px;
+  text-align: left;
+  background: #cbb286;
+  border-top: 4px solid var(--radio-line);
+}
+
+.record-bay::before {
+  content: "QUEUE";
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 2px solid #6f563e;
+  border-radius: 3px;
+  background: #c8ae80;
+  color: #76513b;
+  font-size: 0.88rem;
+}
+
+.rec-light {
+  color: var(--accent);
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.speaker-grill {
+  width: 100%;
+  height: 58px;
+  border: 4px solid #2a1d17;
+  background-color: #3a2a22;
+  box-shadow: inset 0 0 0 4px #21150f;
+  overflow: hidden;
+  position: relative;
+}
+
+.speaker-grill::before {
+  content: "••••••••••••••••••\A••••••••••••••••••";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 10px;
+  color: #d8c29b;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 15px;
+  letter-spacing: 7px;
+  line-height: 16px;
+  white-space: pre;
+}
+
+.pixel-btn {
+  width: 100%;
+  min-height: 58px;
+  border: 4px solid #21150f;
+  border-radius: 5px;
+  background: #9b3f2e;
+  color: #fff7e7;
+  cursor: pointer;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  box-shadow: inset 0 -5px 0 #6a2b21, 0 5px 0 #4b281b;
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+}
+
+.pixel-btn::before {
+  content: "REC";
+  margin-right: 8px;
+  color: #ffd9bd;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 0.76rem;
+}
+.pixel-btn:hover { filter: brightness(1.05); transform: translateY(-2px); }
 .pixel-btn:active {
-  box-shadow: 0 0 0 0 var(--accent);
-  transform: translate(var(--pixel), var(--pixel));
+  transform: translateY(4px);
+  box-shadow: inset 0 -2px 0 #6a2b21, 0 1px 0 #4b281b;
 }
 .pixel-btn:disabled {
-  background: var(--muted);
-  box-shadow: 2px 2px 0 0 #a08070;
+  filter: grayscale(0.75);
   cursor: not-allowed;
-  transform: none;
 }
 
-.pixel-btn.accent {
-  background: var(--accent);
-  box-shadow: var(--pixel) var(--pixel) 0 0 #a04030;
-}
-
-/* ── Progress Section ──────────────────────────────── */
-#progress-section {
+.meter {
   display: none;
+  width: 100%;
+  padding: 12px;
+  border: 3px solid #2a1d17;
+  border-radius: 3px;
+  background: #cdb58e;
+}
+.meter-grid {
+  height: 22px;
+  background: #4f6e38;
+  border-right: 28px solid #9b3f2e;
 }
 
-.step-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+.status-strip {
+  display: grid;
+  gap: 10px;
+  margin: 0 28px 28px;
 }
 
-.step-item {
-  display: flex;
+.status-chip-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.6rem;
-  font-size: 0.7rem;
-  border: 2px solid transparent;
-  transition: all 0.2s;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 2px solid #6c503d;
+  border-radius: 4px;
+  background: #4b3529;
+  color: #ead6b1;
 }
 
-.step-item .icon {
-  width: 20px;
-  text-align: center;
-  flex-shrink: 0;
+.status-chip-item span {
+  color: #bda484;
+}
+
+.status-chip-item b {
+  color: #fff4dc;
+  font-family: "Cascadia Mono", Consolas, monospace;
   font-size: 0.8rem;
 }
 
-.step-item.waiting { color: var(--muted); }
-.step-item.waiting .icon::before { content: '⬜'; }
-.step-item.running { color: var(--accent); border-color: var(--secondary); background: #fffaf6; }
-.step-item.running .icon::before { content: '▶'; animation: blink 0.6s step-end infinite; }
-.step-item.done { color: var(--success); }
-.step-item.done .icon::before { content: '✅'; }
-.step-item.error { color: #d44; }
-.step-item.error .icon::before { content: '❌'; }
-
-@keyframes blink {
-  50% { opacity: 0; }
+.progress-console {
+  padding: 18px;
+  background: #cdb58e;
 }
-
-/* Pixel progress bar */
+#progress-section { display: none; }
 .progress-bar-outer {
-  margin-top: 0.8rem;
-  height: 14px;
-  border: 3px solid var(--border);
-  background: #fffdf9;
-  position: relative;
+  height: 16px;
+  border: 3px solid #2a1d17;
+  border-radius: 3px;
+  background: #c8b089;
+  overflow: hidden;
 }
 .progress-bar-inner {
   height: 100%;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--primary) 0px,
-    var(--primary) 8px,
-    #f0a890 8px,
-    #f0a890 10px
-  );
   width: 0%;
-  transition: width 0.3s step-end;
+  background: #6f7e42;
+  transition: width 240ms ease;
 }
 .progress-text {
-  font-size: 0.6rem;
-  color: var(--muted);
+  margin: 8px 0 0;
   text-align: right;
-  margin-top: 0.2rem;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.step-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.step-item {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 2px solid #9c835d;
+  border-radius: 3px;
+  padding: 0.5rem 0.65rem;
+  background: #e3cfa8;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.step-item .icon {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: 0 0 auto;
+}
+.step-item.running { color: var(--accent); background: #e8bca4; }
+.step-item.running .icon { animation: pulse 800ms ease infinite; }
+.step-item.done { color: var(--green); }
+.step-item.error { color: #b42521; }
+
+@keyframes pulse {
+  50% { transform: scale(1.55); opacity: 0.45; }
 }
 
-/* ── Output Section ────────────────────────────────── */
+.tape-container {
+  display: none;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 18px;
+}
+.tape-container.active { display: flex; }
+.tape-reel {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #eadcc2;
+  border-radius: 50%;
+  position: relative;
+}
+.tape-reel::after {
+  content: "";
+  position: absolute;
+  inset: 15px;
+  border-radius: 50%;
+  background: #b9825c;
+}
+.tape-reel.spin { animation: spin 1.2s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
 #output-section {
   display: none;
+  margin-top: 28px;
 }
 
-.script-content {
-  font-size: 0.75rem;
-  line-height: 1.8;
-  max-height: 500px;
-  overflow-y: auto;
-  padding: 1rem;
-  border: 3px solid var(--border);
-  background: #fffdf9;
-  white-space: pre-wrap;
-  word-break: break-word;
+.broadcast-post {
+  border: 4px solid #1b120d;
+  border-radius: 4px;
+  background: #f0ddb8;
+  color: var(--ink);
+  box-shadow: 12px 14px 0 #1a120e;
+  overflow: hidden;
+  position: relative;
 }
 
-.script-content::-webkit-scrollbar {
-  width: 8px;
-}
-.script-content::-webkit-scrollbar-track {
-  background: var(--card);
-}
-.script-content::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border: 2px solid var(--card);
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0 28px 24px;
+  background: #f5e2bc;
 }
 
-/* ── Media Output ──────────────────────────────────── */
-#audio-section,
+.summary-item {
+  padding: 12px 14px;
+  border: 2px solid #a47f57;
+  border-radius: 4px;
+  background: #fff4d9;
+}
+
+.summary-item span {
+  display: block;
+  color: #86664d;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+
+.summary-item b {
+  color: #2a1d17;
+  font-size: 0.98rem;
+}
+
+.broadcast-post::before {
+  content: none;
+}
+
+.broadcast-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: start;
+  padding: 26px 30px;
+  border-bottom: 4px solid #b3986d;
+  background:
+    linear-gradient(180deg, #f8eacb, #f2dfba);
+}
+
+.broadcast-kicker {
+  margin: 0 0 10px;
+  color: #8b654e;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 0.85rem;
+}
+
+.broadcast-title {
+  margin: 0;
+  color: #2a1d17;
+  font-size: clamp(1.8rem, 4vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.broadcast-subtitle {
+  margin: 14px 0 0;
+  color: #6f5848;
+  max-width: 62ch;
+  line-height: 1.7;
+}
+
+.blog-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.download-link,
+.audio-download,
+.image-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 2px solid #6f563e;
+  border-radius: 3px;
+  padding: 0.55rem 0.95rem;
+  color: #3b261b;
+  text-decoration: none;
+  background: #f8eacb;
+  transition: transform 180ms ease, background 180ms ease;
+}
+.download-link:hover,
+.audio-download:hover,
+.image-download:hover {
+  background: #9d4f35;
+  color: #fff7e7;
+  transform: translateY(-1px);
+}
+.download-link:focus-visible,
+.audio-download:focus-visible,
+.image-download:focus-visible,
+.pixel-btn:focus-visible {
+  outline: 3px solid #f6c37c;
+  outline-offset: 3px;
+}
+
+.player-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+  gap: 0;
+  position: relative;
+}
+
+.album-side {
+  padding: 28px;
+  border-right: 4px solid #b3986d;
+  background: #e3cfa8;
+}
+
 #image-section,
+#audio-section,
 #warning-section {
   display: none;
-  margin-top: 1rem;
 }
 
-.audio-card,
 .image-card,
+.audio-card,
 .warning-card {
-  border: 3px solid var(--border);
-  background: var(--card);
-  padding: 0.8rem 1rem;
+  display: grid;
+  gap: 12px;
 }
 
-.audio-card audio {
-  width: 100%;
-  height: 36px;
-  border-radius: 0;
-}
-
-.audio-label,
 .image-label,
+.audio-label,
 .warning-label {
-  font-size: 0.7rem;
-  letter-spacing: 1px;
-  margin-bottom: 0.5rem;
-  color: var(--accent);
+  font-family: "Cascadia Mono", Consolas, monospace;
+  color: #7c5d47;
+  font-size: 0.85rem;
+}
+
+.cover-frame {
+  aspect-ratio: 1;
+  padding: 12px;
+  border: 4px solid #2a1d17;
+  border-radius: 3px;
+  background: #fff1cf;
+  box-shadow: 6px 6px 0 #b3986d;
 }
 
 .cover-image {
   display: block;
   width: 100%;
-  max-height: 360px;
-  object-fit: contain;
-  image-rendering: auto;
-  border: 3px solid var(--border);
-  background: #fffdf9;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
 }
 
+.cover-placeholder {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  text-align: center;
+  color: #7d604c;
+  border: 3px dashed #8a7059;
+  border-radius: 3px;
+  background: #fff1cf;
+}
+
+.cover-placeholder::before {
+  content: "radio cover slot";
+  display: block;
+  margin-bottom: 12px;
+  color: #9d4f35;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-weight: 800;
+}
+
+.lcd-player {
+  margin-top: 20px;
+  padding: 16px;
+  border: 5px solid #1b120d;
+  border-radius: 4px;
+  background: var(--lcd);
+  color: var(--lcd-dark);
+  box-shadow: inset 0 0 0 3px #8d965c, 5px 5px 0 #b3986d;
+}
+
+.lcd-title {
+  margin: 0 0 10px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: clamp(1.4rem, 3vw, 2.6rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.audio-card audio {
+  width: 100%;
+  height: 38px;
+  accent-color: var(--accent);
+}
+
+.lcd-bars {
+  height: 18px;
+  margin-top: 14px;
+  background: #2f351f;
+  background-size: 12px 18px;
+  border-right: 8px solid var(--lcd);
+}
+
+.transcript-side {
+  padding: 30px;
+  background: #f8eacb;
+}
+
+.script-content {
+  min-height: 420px;
+  max-height: 720px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #34231a;
+  font-size: 1.04rem;
+  line-height: 1.9;
+  padding-right: 12px;
+  border-top: 2px solid #c4aa7d;
+  padding-top: 18px;
+  text-wrap: pretty;
+}
+
+.script-content::-webkit-scrollbar { width: 10px; }
+.script-content::-webkit-scrollbar-track { background: #e3cfa8; }
+.script-content::-webkit-scrollbar-thumb { background: #8a7059; border-radius: 0; }
+
 .warning-card {
-  border-color: #d9a45f;
-  color: #8a5a21;
+  margin: 0 28px 24px;
+  padding: 14px 16px;
+  border: 3px solid #91672c;
+  border-radius: 3px;
+  background: #ffe6aa;
+  color: #6f4820;
   white-space: pre-wrap;
 }
 
-.audio-download,
-.image-download {
-  display: inline-block;
-  margin-top: 0.5rem;
-  font-size: 0.65rem;
-  color: var(--primary);
-  text-decoration: none;
-  border: 2px solid var(--primary);
-  padding: 0.3rem 0.8rem;
-  transition: all 0.1s;
-}
-.audio-download:hover,
-.image-download:hover {
-  background: var(--primary);
-  color: #fff;
-}
-
-/* ── Tape animation ────────────────────────────────── */
-.tape-container {
-  display: none;
-  justify-content: center;
-  gap: 12px;
-  padding: 0.5rem;
-}
-.tape-container.active { display: flex; }
-
-.tape-reel {
-  width: 24px;
-  height: 24px;
-  border: 3px solid var(--text);
-  border-radius: 50%;
-  position: relative;
-}
-.tape-reel::after {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 6px; height: 6px;
-  background: var(--accent);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-.tape-reel.spin {
-  animation: spin 2s linear infinite;
-}
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* ── Pixel confetti ────────────────────────────────── */
 .confetti-container {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%;
+  inset: 0;
   pointer-events: none;
-  z-index: 999;
+  z-index: 9;
 }
 .confetti-piece {
   position: absolute;
@@ -451,110 +941,243 @@ body {
   animation: confetti-fall 2s ease-out forwards;
 }
 @keyframes confetti-fall {
-  0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  from { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  to { transform: translateY(100vh) rotate(540deg); opacity: 0; }
 }
 
-/* ── Responsive ────────────────────────────────────── */
-@media (max-width: 500px) {
-  body { padding: 1rem 0.5rem; }
-  .pixel-card { padding: 1rem; }
-  .header h1 { font-size: 1.1rem; }
-  .pixel-btn { font-size: 0.7rem; padding: 0.6rem 1.2rem; }
-  .input-row { flex-direction: column; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@media (max-width: 940px) {
+  .studio-grid,
+  .player-layout {
+    grid-template-columns: 1fr;
+  }
+  .summary-strip {
+    grid-template-columns: 1fr;
+  }
+  .input-bay,
+  .album-side {
+    border-right: 0;
+    border-bottom: 3px solid #5a3f2f;
+  }
+  .broadcast-header {
+    grid-template-columns: 1fr;
+  }
+  .blog-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 620px) {
+  .radio-shell { width: min(100% - 20px, 1180px); padding-top: 16px; }
+  .topbar { align-items: flex-start; gap: 12px; flex-direction: column; }
+  .device { margin: 14px; }
+  .device-head,
+  .broadcast-header,
+  .album-side,
+  .transcript-side {
+    padding: 18px;
+  }
+  .intro-copy { padding: 18px 18px 0; }
+  .input-row,
+  .mode-selector,
+  .step-list {
+    grid-template-columns: 1fr;
+  }
+  .record-bay {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+  }
+  .pixel-btn {
+    min-height: 56px;
+  }
+  .script-content {
+    min-height: 320px;
+    max-height: none;
+  }
 }
 </style>
 </head>
 <body>
-<div class="container">
-
-  <!-- Header -->
-  <div class="pixel-card header">
-    <span class="header-icon">🎙️</span>
-    <h1>PIXEL RADIO STUDIO</h1>
-    <p class="tagline">论文 → 中文播客脚本 · PaperCast Agent</p>
-    <div class="signal-bars">
-      <span></span><span></span><span></span><span></span><span></span>
+<a class="skip-link" href="#main">跳到主内容</a>
+<main class="radio-shell" id="main">
+  <nav class="topbar" aria-label="PaperCast">
+    <div class="brand">
+      <span class="brand-mark">PC</span>
+      <span>PaperCast Radio</span>
     </div>
-  </div>
+    <div class="status-chip">coffee radio notes + voice</div>
+  </nav>
 
-  <!-- Input -->
-  <div class="pixel-card" id="input-card">
-    <div class="input-group">
-      <div class="input-row">
-        <input class="pixel-input" id="arxiv-id" placeholder="🔬 arXiv ID (例: 2401.00000)">
-        <input class="pixel-input" id="pdf-url" placeholder="🔗 PDF URL">
+  <section class="studio-grid" aria-label="论文转播客工作台">
+    <div class="readme-panel">
+      <div class="panel-tab">今天的论文咖啡</div>
+      <p class="intro-copy">把 arXiv、PDF 链接或本地论文放到吧台，PaperCast 会把它煮成一篇中文电台博客。完整模式会继续配好封面和语音。</p>
+      <div class="coffee-note">适合一边听，一边慢慢读。快速模式先出文字，完整模式会补上封面和音频。</div>
+
+      <div class="device" id="input-card">
+        <div class="device-head">
+          <div class="window-buttons" aria-hidden="true">
+            <span class="light red"></span>
+            <span class="light yellow"></span>
+            <span class="light green"></span>
+          </div>
+          <div class="device-logo">PaperCast<span>coffee radio journal</span></div>
+        </div>
+
+        <div class="control-room">
+          <div class="input-bay">
+            <div class="bay-label"><span><b>01</b>点单</span><span>论文来源</span></div>
+            <div class="tape-input">
+              <div class="input-grid">
+                <div class="input-row">
+                  <label class="sr-only" for="arxiv-id">arXiv ID</label>
+                  <input class="pixel-input" id="arxiv-id" placeholder="arXiv ID, 例如 2401.00000" aria-describedby="input-help">
+                  <label class="sr-only" for="pdf-url">PDF URL</label>
+                  <input class="pixel-input" id="pdf-url" placeholder="PDF URL" aria-describedby="input-help">
+                </div>
+                <div class="file-upload-wrap">
+                  <input type="file" id="local-pdf" accept=".pdf">
+                  <label class="file-label" for="local-pdf" id="file-label">或上传本地 PDF</label>
+                </div>
+                <p class="input-help" id="input-help">三种来源任选其一。上传本地 PDF 会直接复制到工作区。</p>
+                <p class="form-error" id="form-error" role="alert"></p>
+                <div class="mode-selector" role="radiogroup" aria-label="转换模式">
+                  <label class="mode-option">
+                    <input type="radio" name="run-mode" value="fast" checked>
+                    <span><strong>快速模式</strong>更快生成脚本，跳过封面和音频，适合先看内容。</span>
+                  </label>
+                  <label class="mode-option">
+                    <input type="radio" name="run-mode" value="full">
+                    <span><strong>完整模式</strong>生成脚本、封面和音频，完成后进入电台博客。</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="record-bay">
+            <div class="rec-light">BREW</div>
+            <div class="speaker-grill" aria-hidden="true"></div>
+            <button class="pixel-btn" id="btn-run" onclick="startPipeline()">生成</button>
+          </div>
+        </div>
+
+        <div class="progress-console" id="progress-section">
+          <div class="result-label"><span><b>02</b>进度</span><span id="progress-mode">READY</span></div>
+          <div class="progress-bar-outer">
+            <div class="progress-bar-inner" id="progress-bar"></div>
+          </div>
+          <p class="progress-text" id="progress-text">0%</p>
+          <ul class="step-list" id="step-list"></ul>
+        </div>
       </div>
-      <div class="file-upload-wrap">
-        <input type="file" id="local-pdf" accept=".pdf">
-        <label class="file-label" for="local-pdf" id="file-label">📂 或上传本地 PDF...</label>
-      </div>
-      <label class="option-toggle" for="fast-mode">
-        <input type="checkbox" id="fast-mode">
-        <span>快速模式：更快生成脚本，跳过封面和音频</span>
-      </label>
-      <button class="pixel-btn" id="btn-run" onclick="startPipeline()">
-        ▶ 开始生成
-      </button>
     </div>
-  </div>
 
-  <!-- Tape animation -->
-  <div class="tape-container" id="tape">
-    <div class="tape-reel spin"></div>
-    <div class="tape-reel spin"></div>
-  </div>
-
-  <!-- Progress -->
-  <div class="pixel-card" id="progress-section">
-    <h3 style="font-size:0.8rem;margin-bottom:0.8rem;letter-spacing:1px;">📻 生成进度</h3>
-    <div class="progress-bar-outer">
-      <div class="progress-bar-inner" id="progress-bar"></div>
-    </div>
-    <p class="progress-text" id="progress-text">0%</p>
-    <ul class="step-list" id="step-list"></ul>
-  </div>
-
-  <!-- Output -->
-  <div class="pixel-card" id="output-section">
-    <h3 style="font-size:0.8rem;margin-bottom:0.8rem;letter-spacing:1px;">📝 播客脚本</h3>
-    <div id="warning-section">
-      <div class="warning-card">
-        <div class="warning-label">⚠️ 媒体提示</div>
-        <div id="warning-content"></div>
+    <aside class="readme-panel" aria-label="当前输出说明">
+      <div class="panel-tab">咖啡店播放单</div>
+      <p class="intro-copy">生成时可以先看进度。完成后页面会自动落到一篇温暖的电台博客，封面、播放器和脚本放在同一个阅读空间里。</p>
+      <div class="coffee-menu">
+        <div class="menu-item">
+          <div class="menu-index">01</div>
+          <div><strong>快速杯</strong><span>只生成脚本，更适合先检查论文内容。</span></div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-index">02</div>
+          <div><strong>完整杯</strong><span>脚本、封面和语音一起生成，更适合发布或试听。</span></div>
+        </div>
       </div>
-    </div>
-    <div id="image-section">
-      <div class="image-card">
-        <div class="image-label">🖼️ 播客封面</div>
-        <img class="cover-image" id="cover-image" alt="播客封面">
-        <a class="image-download" id="image-download" href="#" download>⬇ 下载封面</a>
+      <div class="status-strip" aria-label="功能状态">
+        <div class="status-chip-item"><span>脚本</span><b>READY</b></div>
+        <div class="status-chip-item"><span>封面</span><b>COMFYUI</b></div>
+        <div class="status-chip-item"><span>音频</span><b>VOICE</b></div>
       </div>
-    </div>
-    <div id="audio-section">
-      <div class="audio-card">
-        <div class="audio-label">🎧 播客音频</div>
-        <audio id="audio-player" controls></audio>
-        <a class="audio-download" id="audio-download" href="#" download>⬇ 下载音频</a>
+      <div class="tape-container" id="tape" aria-hidden="true">
+        <div class="tape-reel spin"></div>
+        <div class="tape-reel spin"></div>
       </div>
-    </div>
-    <div class="script-content" id="script-content"></div>
-  </div>
+    </aside>
+  </section>
 
-</div>
+  <section id="output-section" aria-label="生成结果">
+    <article class="broadcast-post">
+      <header class="broadcast-header">
+        <div>
+          <p class="broadcast-kicker">NOW SERVING | PAPERCAST CAFE RADIO</p>
+          <h1 class="broadcast-title" id="result-title">论文播客已生成</h1>
+          <p class="broadcast-subtitle" id="result-subtitle">封面、音频和脚本会在这里汇总，像咖啡店里一篇可以播放的研究手记。</p>
+        </div>
+        <div class="blog-actions">
+          <a class="download-link" href="#script-content">阅读脚本</a>
+          <a class="download-link" href="#audio-section">播放音频</a>
+        </div>
+      </header>
+
+      <div id="warning-section">
+        <div class="warning-card">
+          <div class="warning-label">媒体提示</div>
+          <div id="warning-content"></div>
+        </div>
+      </div>
+
+      <div class="summary-strip">
+        <div class="summary-item"><span>模式</span><b id="summary-mode">FAST</b></div>
+        <div class="summary-item"><span>封面</span><b id="summary-image">等待生成</b></div>
+        <div class="summary-item"><span>音频</span><b id="summary-audio">等待生成</b></div>
+      </div>
+
+      <div class="player-layout">
+        <aside class="album-side">
+          <div id="image-section">
+            <div class="image-card">
+              <div class="image-label">今日封面</div>
+              <div class="cover-frame">
+                <img class="cover-image" id="cover-image" alt="播客封面">
+              </div>
+              <a class="image-download" id="image-download" href="#" download>下载封面</a>
+            </div>
+          </div>
+          <div class="cover-placeholder" id="cover-placeholder">快速模式不会生成封面。切换完整模式，会得到一张更适合电台博客的封面和音频。</div>
+
+          <div class="lcd-player" id="audio-section">
+            <div class="audio-card">
+              <div class="audio-label">CAFE RADIO FM</div>
+              <p class="lcd-title" id="lcd-title">Now Playing</p>
+              <audio id="audio-player" controls></audio>
+              <div class="lcd-bars" aria-hidden="true"></div>
+              <a class="audio-download" id="audio-download" href="#" download>下载音频</a>
+            </div>
+          </div>
+        </aside>
+
+        <section class="transcript-side" aria-label="播客脚本">
+          <div class="result-label"><span><b>03</b>手记</span><span>READ</span></div>
+          <div class="script-content" id="script-content"></div>
+        </section>
+      </div>
+    </article>
+  </section>
+</main>
 
 <div class="confetti-container" id="confetti"></div>
 
 <script>
 const STEPS = [
-  { id: '输入解析',  label: '解析论文输入' },
-  { id: 'PDF下载',   label: '下载论文 PDF' },
-  { id: 'Markdown转换', label: 'PDF → Markdown 转换' },
-  { id: '文本分块',  label: '文本智能切分' },
-  { id: 'LLM摘要',   label: 'AI 逐段摘要' },
-  { id: '生成脚本',  label: '生成播客脚本' },
-  { id: '封面生成',  label: '生成播客封面' },
-  { id: '音频合成',  label: '合成语音音频' },
+  { id: '输入解析', label: '解析论文输入' },
+  { id: 'PDF下载', label: '下载论文 PDF' },
+  { id: 'Markdown转换', label: 'PDF 转 Markdown' },
+  { id: '文本分块', label: '文本智能切分' },
+  { id: 'LLM摘要', label: 'AI 逐段摘要' },
+  { id: '生成脚本', label: '生成播客脚本' },
+  { id: '封面生成', label: '生成播客封面' },
+  { id: '音频合成', label: '合成语音音频' },
 ];
 
 let eventSource = null;
@@ -562,7 +1185,7 @@ let eventSource = null;
 function initSteps() {
   const list = document.getElementById('step-list');
   list.innerHTML = STEPS.map(s =>
-    `<li class="step-item waiting" id="step-${s.id}"><span class="icon"></span>${s.label}</li>`
+    `<li class="step-item waiting" id="step-${s.id}"><span class="icon"></span><span>${s.label}</span></li>`
   ).join('');
 }
 
@@ -573,67 +1196,118 @@ function updateStep(stepId, status) {
 }
 
 function setProgress(pct) {
-  document.getElementById('progress-bar').style.width = pct + '%';
-  document.getElementById('progress-text').textContent = pct + '%';
+  const clean = Number.isFinite(Number(pct)) ? Number(pct) : 0;
+  document.getElementById('progress-bar').style.width = clean + '%';
+  document.getElementById('progress-text').textContent = clean + '%';
 }
 
 function showSection(id) {
   document.getElementById(id).style.display = 'block';
 }
 
+function hideSection(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+function scrollToOutput() {
+  document.getElementById('output-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function setFormError(message) {
+  document.getElementById('form-error').textContent = message || '';
+}
+
+function extractTitle(text) {
+  const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  const candidate = lines.find(line => !/^(主播|旁白|欢迎|大家好|开场|片头|标题[:：]?$)/.test(line)) || lines[0] || '论文播客已生成';
+  return candidate.replace(/^#+\s*/, '').replace(/^标题[:：]\s*/, '').slice(0, 64);
+}
+
+function updateResultText(text) {
+  const title = extractTitle(text);
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('lcd-title').textContent = title.length > 22 ? title.slice(0, 22) + '...' : title;
+  document.getElementById('result-subtitle').textContent = '已整理为可播放的中文论文播客。你可以先听音频，再继续阅读完整脚本。';
+}
+
 function spawnConfetti() {
   const container = document.getElementById('confetti');
-  const colors = ['#e8957c','#f4c7ab','#d4694a','#7cb88a','#f0c090','#e0b0c0'];
-  for (let i = 0; i < 40; i++) {
+  const colors = ['#c33b2f', '#e8dfcb', '#9faf68', '#f2c27d'];
+  for (let i = 0; i < 34; i++) {
     const piece = document.createElement('div');
     piece.className = 'confetti-piece';
     piece.style.left = Math.random() * 100 + '%';
-    piece.style.animationDelay = Math.random() * 1 + 's';
-    piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    piece.style.animationDelay = Math.random() * 0.8 + 's';
     piece.style.background = colors[Math.floor(Math.random() * colors.length)];
     container.appendChild(piece);
-    setTimeout(() => piece.remove(), 3500);
+    setTimeout(() => piece.remove(), 3000);
   }
 }
 
+function getRequestErrorMessage(err) {
+  if (window.location.protocol === 'file:') {
+    return '页面是直接从 HTML 文件打开的，无法连接后端。请访问 http://localhost:5000/ 再生成。';
+  }
+  if (err && err.message === 'Failed to fetch') {
+    return '无法连接后端服务。请确认 Flask 服务正在运行，并访问 http://localhost:5000/。';
+  }
+  return err && err.message ? err.message : '未知错误';
+}
+
+function resetResult() {
+  hideSection('output-section');
+  hideSection('warning-section');
+  hideSection('image-section');
+  hideSection('audio-section');
+  setFormError('');
+  document.getElementById('cover-placeholder').style.display = 'grid';
+  document.getElementById('warning-content').textContent = '';
+  document.getElementById('script-content').textContent = '';
+  document.getElementById('result-title').textContent = '论文播客已生成';
+  document.getElementById('result-subtitle').textContent = '封面、音频和脚本会在这里汇总，像一篇可以播放的研究博客。';
+  document.getElementById('lcd-title').textContent = 'Now Playing';
+  document.getElementById('summary-mode').textContent = 'FAST';
+  document.getElementById('summary-image').textContent = '等待生成';
+  document.getElementById('summary-audio').textContent = '等待生成';
+  document.getElementById('audio-player').removeAttribute('src');
+  document.getElementById('cover-image').removeAttribute('src');
+}
+
 function startPipeline() {
+  if (window.location.protocol === 'file:') {
+    setFormError('请访问 http://localhost:5000/ 使用 PaperCast，不要直接打开 src/templates/index.html。');
+    return;
+  }
+
   const arxivId = document.getElementById('arxiv-id').value.trim();
   const pdfUrl = document.getElementById('pdf-url').value.trim();
   const fileInput = document.getElementById('local-pdf');
   const file = fileInput.files[0];
-  const fastMode = document.getElementById('fast-mode').checked;
+  const runMode = document.querySelector('input[name="run-mode"]:checked').value;
+  const fastMode = runMode === 'fast';
 
   if (!arxivId && !pdfUrl && !file) {
-    alert('请填写 arXiv ID、PDF URL 或上传 PDF 文件');
+    setFormError('请填写 arXiv ID、PDF URL 或上传 PDF 文件。');
     return;
   }
 
-  // Reset UI
   initSteps();
   setProgress(0);
   showSection('progress-section');
-  document.getElementById('output-section').style.display = 'none';
-  document.getElementById('warning-section').style.display = 'none';
-  document.getElementById('image-section').style.display = 'none';
-  document.getElementById('audio-section').style.display = 'none';
-  document.getElementById('warning-content').textContent = '';
-  document.getElementById('script-content').textContent = '';
+  resetResult();
+  document.getElementById('progress-mode').textContent = fastMode ? 'FAST MODE' : 'FULL MODE';
+  document.getElementById('summary-mode').textContent = fastMode ? 'FAST' : 'FULL';
   document.getElementById('tape').classList.add('active');
   document.getElementById('btn-run').disabled = true;
 
-  // Build form data
   const formData = new FormData();
   if (arxivId) formData.append('arxiv_id', arxivId);
   if (pdfUrl) formData.append('pdf_url', pdfUrl);
   if (file) formData.append('local_pdf', file);
   if (fastMode) formData.append('fast_mode', 'on');
 
-  // Close existing SSE
   if (eventSource) eventSource.close();
 
-  eventSource = new EventSource('/api/run?' + new URLSearchParams({_cb: Date.now()}));
-
-  // POST to start pipeline
   fetch('/api/run', { method: 'POST', body: formData })
     .then(response => {
       if (!response.ok) throw new Error('Server error');
@@ -654,8 +1328,7 @@ function startPipeline() {
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               try {
-                const data = JSON.parse(line.slice(6));
-                handleSSE(data);
+                handleSSE(JSON.parse(line.slice(6)));
               } catch(e) {}
             }
           }
@@ -665,10 +1338,20 @@ function startPipeline() {
       read();
     })
     .catch(err => {
-      updateStep('错误', 'error');
+      updateStep('输入解析', 'error');
       document.getElementById('tape').classList.remove('active');
       document.getElementById('btn-run').disabled = false;
-      alert('请求失败: ' + err.message);
+      setFormError('请求失败: ' + getRequestErrorMessage(err));
+    });
+}
+
+function finishWithScript(path) {
+  fetch('/api/script?path=' + encodeURIComponent(path))
+    .then(r => r.text())
+    .then(text => {
+      document.getElementById('script-content').textContent = text;
+      updateResultText(text);
+      scrollToOutput();
     });
 }
 
@@ -676,12 +1359,12 @@ function handleSSE(data) {
   const { step, status, message, percent } = data;
 
   if (step === '错误') {
-    updateStep(STEPS.find(s => s.status === 'running')?.id || '输入解析', 'error');
+    updateStep('输入解析', 'error');
     document.getElementById('tape').classList.remove('active');
     document.getElementById('btn-run').disabled = false;
-    const scriptEl = document.getElementById('script-content');
-    scriptEl.textContent = '❌ 错误: ' + message;
+    document.getElementById('script-content').textContent = '错误: ' + message;
     showSection('output-section');
+    scrollToOutput();
     return;
   }
 
@@ -692,37 +1375,33 @@ function handleSSE(data) {
     document.getElementById('btn-run').disabled = false;
     showSection('output-section');
     spawnConfetti();
-    // Parse completion data
+
     try {
       const paths = JSON.parse(message);
       if (paths.warnings && paths.warnings.length) {
-        document.getElementById('warning-section').style.display = 'block';
+        showSection('warning-section');
         document.getElementById('warning-content').textContent = paths.warnings.join('\n');
       }
       if (paths.image) {
-        document.getElementById('image-section').style.display = 'block';
+        showSection('image-section');
+        document.getElementById('cover-placeholder').style.display = 'none';
         document.getElementById('cover-image').src = '/api/image?path=' + encodeURIComponent(paths.image);
         document.getElementById('image-download').href = '/api/image?path=' + encodeURIComponent(paths.image);
+        document.getElementById('summary-image').textContent = '已生成';
+      } else {
+        document.getElementById('summary-image').textContent = '未生成';
       }
-      // Load script
-      fetch('/api/script?path=' + encodeURIComponent(paths.script))
-        .then(r => r.text())
-        .then(text => {
-          document.getElementById('script-content').textContent = text;
-        });
-      // Show audio
       if (paths.audio) {
-        document.getElementById('audio-section').style.display = 'block';
+        showSection('audio-section');
         document.getElementById('audio-player').src = '/api/audio?path=' + encodeURIComponent(paths.audio);
         document.getElementById('audio-download').href = '/api/audio?path=' + encodeURIComponent(paths.audio);
+        document.getElementById('summary-audio').textContent = '已生成';
+      } else {
+        document.getElementById('summary-audio').textContent = '未生成';
       }
+      finishWithScript(paths.script);
     } catch(e) {
-      // Fallback: old format (just a path string)
-      fetch('/api/script?path=' + encodeURIComponent(message))
-        .then(r => r.text())
-        .then(text => {
-          document.getElementById('script-content').textContent = text;
-        });
+      finishWithScript(message);
     }
     return;
   }
@@ -731,7 +1410,6 @@ function handleSSE(data) {
   setProgress(percent);
 
   if (status === 'done') {
-    // Auto-complete all previous steps
     let found = false;
     for (const s of STEPS) {
       if (s.id === step) { found = true; continue; }
@@ -740,14 +1418,13 @@ function handleSSE(data) {
   }
 }
 
-// File upload label update
 document.getElementById('local-pdf').addEventListener('change', function() {
   const label = document.getElementById('file-label');
   if (this.files[0]) {
-    label.textContent = '📂 ' + this.files[0].name;
+    label.textContent = this.files[0].name;
     label.classList.add('has-file');
   } else {
-    label.textContent = '📂 或上传本地 PDF...';
+    label.textContent = '或上传本地 PDF';
     label.classList.remove('has-file');
   }
 });

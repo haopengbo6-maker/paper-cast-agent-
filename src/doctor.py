@@ -55,7 +55,7 @@ def run_doctor(root: Path, check_optional_imports: bool = True) -> DoctorReport:
             messages.append("Image provider disabled")
 
         if media_config.voice.enabled:
-            if media_config.voice.base_url:
+            if media_config.voice.provider == "edge_tts" or media_config.voice.base_url:
                 messages.append(f"Voice provider configured: {media_config.voice.provider}")
             else:
                 errors.append("COSYVOICE_BASE_URL is required when MEDIA_VOICE_PROVIDER=cosyvoice")

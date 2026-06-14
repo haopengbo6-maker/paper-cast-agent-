@@ -49,6 +49,7 @@ UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
 @dataclass(frozen=True)
 class RunOptions:
+    output_tag: str
     chunk_size: int
     chunk_overlap: int
     skip_media: bool
@@ -69,16 +70,18 @@ def _build_run_options(form) -> RunOptions:
     fast_mode = form.get("fast_mode") == "on"
     if fast_mode:
         return RunOptions(
+            output_tag="fast",
             chunk_size=6000,
             chunk_overlap=100,
             skip_media=True,
             summary_max_workers=max(2, _summary_max_workers(default=3)),
         )
     return RunOptions(
+        output_tag="full",
         chunk_size=3000,
         chunk_overlap=300,
         skip_media=False,
-        summary_max_workers=1,
+        summary_max_workers=max(2, _summary_max_workers(default=3)),
     )
 
 
@@ -91,6 +94,15 @@ def _summary_max_workers(default: int = 1) -> int:
     except ValueError:
         return default
     return max(1, value)
+
+
+def _paper_output_id(paper_id: str, options: RunOptions) -> str:
+    return f"{paper_id}_{options.output_tag}"
+
+
+def _record_warning(warnings: list[str], message: str) -> str:
+    warnings.append(message)
+    return message
 
 
 # ─── Pipeline runner (runs in background thread) ────────────────────
@@ -146,17 +158,19 @@ def _run_pipeline(
         )
         _emit(q, "文本分块", "done", f"切分为 {len(chunks)} 个片段", 45)
 
+        output_id = _paper_output_id(paper.paper_id, options)
+
         # Step 4 — Summarize (use the existing module)
         _emit(q, "LLM摘要", "running", f"正在逐块生成摘要 (0/{len(chunks)})...", 50)
         summary_paths = summarize_chunks(
-            chunks, paper_id=paper.paper_id, summary_dir=SUMMARY_DIR,
+            chunks, paper_id=output_id, summary_dir=SUMMARY_DIR,
             map_prompt=map_prompt, llm_client=llm_client, force=force,
             max_workers=options.summary_max_workers,
         )
         _emit(q, "LLM摘要", "done", f"全部 {len(chunks)} 个片段摘要完成", 75)
 
         # Step 5 — Generate script (use the existing module)
-        script_path = SCRIPT_DIR / f"{paper.paper_id}_script.md"
+        script_path = SCRIPT_DIR / f"{output_id}_script.md"
         _emit(q, "生成脚本", "running", "正在生成中文播客脚本...", 80)
         write_script(
             summary_paths, script_path=script_path,
@@ -168,7 +182,7 @@ def _run_pipeline(
         audio_path = None
 
         if options.skip_media:
-            warnings.append("快速模式已跳过封面和音频生成")
+            _record_warning(warnings, "快速模式已跳过封面和音频生成")
             _emit(q, "封面生成", "warning", "快速模式已跳过封面生成", 94)
             _emit(q, "音频合成", "warning", "快速模式已跳过音频合成", 98)
             payload = {"script": str(script_path), "warnings": warnings}
@@ -179,7 +193,7 @@ def _run_pipeline(
         try:
             _emit(q, "封面生成", "running", "正在生成播客封面...", 92)
             image_path = generate_cover_image(
-                paper.paper_id,
+                output_id,
                 script_path,
                 IMAGE_DIR,
                 media_config.image,
@@ -188,16 +202,16 @@ def _run_pipeline(
             if image_path:
                 _emit(q, "封面生成", "done", str(image_path), 94)
             else:
-                _emit(q, "封面生成", "warning", "封面生成已禁用", 94)
+                _emit(q, "封面生成", "warning", _record_warning(warnings, "封面生成已禁用"), 94)
         except Exception as exc:
             warning = f"封面生成失败: {exc}"
-            warnings.append(warning)
+            _record_warning(warnings, warning)
             _emit(q, "封面生成", "warning", warning, 94)
 
         try:
             _emit(q, "音频合成", "running", "正在合成播报音频...", 96)
             audio_path = generate_voice_audio(
-                paper.paper_id,
+                output_id,
                 script_path,
                 AUDIO_DIR,
                 media_config.voice,
@@ -206,10 +220,10 @@ def _run_pipeline(
             if audio_path:
                 _emit(q, "音频合成", "done", str(audio_path), 98)
             else:
-                _emit(q, "音频合成", "warning", "音频合成已禁用", 98)
+                _emit(q, "音频合成", "warning", _record_warning(warnings, "音频合成已禁用"), 98)
         except Exception as exc:
             warning = f"音频合成失败: {exc}"
-            warnings.append(warning)
+            _record_warning(warnings, warning)
             _emit(q, "音频合成", "warning", warning, 98)
 
         payload = {"script": str(script_path), "warnings": warnings}
