@@ -1,22 +1,22 @@
 # PaperCast Agent
 
-PaperCast Agent turns an arXiv paper, PDF URL, or local PDF into a Chinese paper podcast workflow. It can generate the script, optional cover art, and optional voice audio, then present the result in a local art-book style Web UI.
+PaperCast Agent 是一个面向论文阅读与播客创作的本地工具。它可以把 arXiv 论文、PDF URL 或本地 PDF 转换成中文播报脚本，并在 Web 页面中展示处理进度、脚本、封面图和可选音频。
 
-The current visual direction is intentionally not photorealistic: covers are 2D research plates with colored-pencil sketching, messy construction lines, restrained acrylic/oil texture, paper grain, registration marks, and catalogue-like spacing.
+项目的视觉方向不是写实风，而是“艺术书籍封面 / 学术画册”风格：封面生成偏 2D 图版、彩铅素描、凌乱线条、纸张纹理、版心线和克制的科技感，尽量避免随机抽象图或无意义装饰。
 
-## Features
+## 功能特点
 
-- Resolve arXiv IDs, PDF URLs, or uploaded local PDFs.
-- Download and cache PDFs under `data/pdfs/`.
-- Convert PDFs to Markdown with MarkItDown.
-- Split long papers into resumable chunks.
-- Summarize chunks with an OpenAI-compatible LLM endpoint.
-- Reduce summaries into a structured Chinese podcast script.
-- Run a local Flask Web UI with fast mode and full mode.
-- Generate discipline-aware 2D cover images through a running ComfyUI instance.
-- Optionally synthesize audio through a local CosyVoice-compatible service.
+- 支持 arXiv ID、PDF URL、本地 PDF 上传。
+- 自动下载并缓存 PDF 文件。
+- 使用 MarkItDown 将 PDF 转换为 Markdown。
+- 将长论文切分成可恢复的文本块。
+- 调用 OpenAI-compatible LLM 对每个文本块进行摘要。
+- 将分块摘要整合成结构化中文播报脚本。
+- 提供 Flask Web UI，支持快速模式和完整模式。
+- 支持通过本地 ComfyUI 生成跨学科、主题相关的 2D 封面图。
+- 支持通过本地 CosyVoice-compatible 服务生成音频。
 
-## Install
+## 安装
 
 ```bash
 python -m venv .venv
@@ -24,7 +24,7 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Copy `.env.example` to `.env` and fill in your OpenAI-compatible LLM settings:
+复制 `.env.example` 为 `.env`，然后填写你的 LLM 配置：
 
 ```text
 LLM_API_KEY=your_api_key_here
@@ -33,28 +33,28 @@ LLM_MODEL=deepseek-chat
 SUMMARY_MAX_WORKERS=3
 ```
 
-## Run The Web UI
+## 启动 Web 页面
 
 ```bash
 python src/web_app.py
 ```
 
-Open the URL printed by Flask, usually:
+启动后打开 Flask 输出的本地地址，通常是：
 
 ```text
 http://127.0.0.1:5000
 ```
 
-The Web UI supports:
+Web 页面支持：
 
-- arXiv ID input
-- PDF URL input
-- local PDF upload
-- force regeneration
-- fast mode, which skips media generation and uses larger chunks
-- full mode, which runs cover and audio generation when providers are enabled
+- 输入 arXiv ID
+- 输入 PDF URL
+- 上传本地 PDF
+- 强制重新生成
+- 快速模式：使用更大的文本块，并跳过封面和音频生成
+- 完整模式：在媒体服务启用时生成封面和音频
 
-## Run The CLI
+## 命令行用法
 
 ```bash
 python src/main.py --version
@@ -65,25 +65,25 @@ python src/main.py --pdf-url "https://arxiv.org/pdf/2401.00000"
 python src/main.py --arxiv-id "2401.00000" --force
 ```
 
-Existing outputs are skipped by default. Use `--force` to regenerate.
+默认情况下，已有输出会被跳过。需要重新生成时使用 `--force`。
 
-## Output Files
+## 输出目录
 
-Generated files are cached under `data/`:
+生成结果会缓存在 `data/` 目录下：
 
 ```text
-data/pdfs/        downloaded or uploaded PDFs
-data/markdown/    converted Markdown
-data/chunks/      split Markdown chunks and JSONL metadata
-data/summaries/   per-chunk map summaries
-data/scripts/     final Chinese podcast scripts
-data/images/      generated cover images
-data/audio/       generated audio files
+data/pdfs/        下载或上传的 PDF
+data/markdown/    转换后的 Markdown
+data/chunks/      切分后的文本块和 JSONL 元数据
+data/summaries/   每个文本块的摘要
+data/scripts/     最终中文播报脚本
+data/images/      生成的封面图
+data/audio/       生成的音频文件
 ```
 
-## Script Format
+## 脚本格式
 
-The final script is expected to include these sections:
+最终生成的播报脚本应包含以下章节：
 
 ```text
 # 播报标题
@@ -92,13 +92,13 @@ The final script is expected to include these sections:
 # 适合延伸学习的概念
 ```
 
-The cover generator also reads the title, keywords, the first script paragraph, and the first summary cue so the visual concept can follow the actual paper instead of falling back to generic AI imagery.
+封面生成模块会读取标题、关键词、脚本开头段落以及摘要线索，让封面图跟随论文主题，而不是退化成通用 AI 插画。
 
-## ComfyUI Cover Generation
+## ComfyUI 封面生成
 
-PaperCast expects ComfyUI to already be running. It does not install ComfyUI or download checkpoint models.
+PaperCast 默认不会安装 ComfyUI，也不会下载模型。你需要先在本机启动 ComfyUI，并准备好可用 checkpoint。
 
-Enable image generation in `.env`:
+在 `.env` 中启用封面生成：
 
 ```text
 MEDIA_IMAGE_PROVIDER=comfyui
@@ -106,7 +106,7 @@ COMFYUI_BASE_URL=http://127.0.0.1:8188
 COMFYUI_TIMEOUT_SECONDS=180
 ```
 
-The current implementation talks to ComfyUI's native endpoints:
+当前实现直接调用 ComfyUI 原生接口：
 
 ```text
 GET  /object_info
@@ -115,39 +115,41 @@ GET  /history/{prompt_id}
 GET  /view
 ```
 
-It selects the first available `CheckpointLoaderSimple` checkpoint from ComfyUI, builds a simple SDXL-style workflow, and saves the generated PNG under `data/images/` with a prompt-versioned filename such as:
+程序会从 ComfyUI 的 `CheckpointLoaderSimple` 列表中选择第一个可用 checkpoint，构建一个简洁的 SDXL 风格 workflow，并将 PNG 保存到 `data/images/`，文件名包含 prompt 版本号，例如：
 
 ```text
 data/images/{paper_id}_cover_v10.png
 ```
 
-The generated prompt is discipline-aware. It has explicit visual branches for topics such as:
+封面 prompt 会根据论文主题选择视觉母题，目前覆盖：
 
 ```text
-flow matching / generative modeling
-humanoid robotics
-computer vision
-large language models
-medicine and pathology
-physics
-materials science
-biology
-social science and economics
-climate and earth systems
-systems and networking
-control and reinforcement learning
-chemistry
-mathematics
-law
-energy systems
-agriculture
+Flow Matching / 生成模型
+人形机器人 / 具身智能
+计算机视觉
+大语言模型
+医学 / 病理 / 临床
+物理
+材料科学
+生物 / 基因 / 分子
+社会科学 / 经济 / 政策
+气候 / 地球系统 / 遥感
+系统 / 网络 / 分布式
+控制 / 强化学习
+化学
+数学
+法律
+能源系统
+农业
 ```
 
-This is meant to produce meaningful, topic-specific 2D plates rather than random abstract images. A light Pillow post-process adds subtle paper grain and print finish after ComfyUI returns the image.
+目标是生成“有意义的论文图版”，例如机器人论文应出现清晰的人形机器人、关节和运动分析语义；Flow Matching 论文应出现噪声分布、数据流形、向量场和轨迹，而不是随机风景或无关抽象图。
 
-## Voice Generation
+ComfyUI 返回图片后，程序会使用 Pillow 添加很轻的纸纹和印刷质感，使封面与 Web UI 的艺术画册风格更统一。
 
-Enable voice generation in `.env` when you have a compatible local service running:
+## 音频生成
+
+如果本机有兼容的 CosyVoice 服务，可以在 `.env` 中启用音频生成：
 
 ```text
 MEDIA_VOICE_PROVIDER=cosyvoice
@@ -156,21 +158,26 @@ COSYVOICE_TIMEOUT_SECONDS=180
 COSYVOICE_VOICE=default
 ```
 
-Use `MEDIA_IMAGE_PROVIDER=none` or `MEDIA_VOICE_PROVIDER=none` to disable either provider.
+如果不需要封面或音频，可以设置：
 
-If image or audio generation fails during a Web run, PaperCast still returns the generated script and displays a media warning.
+```text
+MEDIA_IMAGE_PROVIDER=none
+MEDIA_VOICE_PROVIDER=none
+```
 
-## Pipeline Notes
+如果 Web 流程中的图片或音频生成失败，系统仍会返回已经生成的脚本，并在页面中显示媒体生成警告。
 
-- PDF downloads are cached and include clear errors for failed HTTP requests.
-- Markdown conversion fails clearly when MarkItDown is missing or produces empty output.
-- Chunk summaries are resumable; completed summary files stay on disk if a later chunk fails.
-- Prompt files are validated before model calls:
-  - `prompts/map_prompt.txt` must contain `{chunk}`.
-  - `prompts/reduce_prompt.txt` must contain `{summaries}`.
-- `python src/main.py --doctor` checks local directories, prompt placeholders, LLM environment variables, and dependencies.
+## 流水线说明
 
-## Tests
+- PDF 下载结果会缓存，下载失败时会给出 URL、HTTP 状态和错误原因。
+- Markdown 转换依赖 MarkItDown；如果依赖缺失或转换结果为空，会明确报错。
+- 分块摘要支持断点恢复；如果后续块失败，已完成摘要会保留在磁盘中。
+- 调用模型前会检查提示词文件：
+  - `prompts/map_prompt.txt` 必须包含 `{chunk}`。
+  - `prompts/reduce_prompt.txt` 必须包含 `{summaries}`。
+- `python src/main.py --doctor` 会检查目录、提示词占位符、LLM 环境变量和依赖。
+
+## 测试
 
 ```bash
 python -m unittest discover -s tests -v
@@ -178,23 +185,23 @@ python -m unittest tests.test_image_generator -v
 python src/main.py --help
 ```
 
-`tests.test_image_generator` covers the ComfyUI workflow builder, checkpoint selection, prompt-versioned output paths, and the discipline-aware cover prompt mapper.
+其中 `tests.test_image_generator` 会覆盖 ComfyUI workflow 构建、checkpoint 选择、封面版本路径以及跨学科 prompt 映射逻辑。
 
-## Project Structure
+## 项目结构
 
 ```text
-src/main.py                CLI and pipeline orchestration
-src/web_app.py             Flask Web UI and SSE pipeline runner
-src/config.py              .env loading and LLM config validation
-src/arxiv_client.py        arXiv ID / PDF URL / local PDF resolution
-src/pdf_downloader.py      PDF download and cache skip
-src/markdown_converter.py  MarkItDown conversion
-src/splitter.py            Markdown chunking
-src/llm_client.py          OpenAI-compatible chat client and retry helper
-src/summarizer.py          Map-stage chunk summaries
-src/script_writer.py       Reduce-stage final script
-src/image_generator.py     ComfyUI workflow and discipline-aware cover prompts
-src/voice_generator.py     Optional voice generation
-src/media_config.py        Media provider configuration
-tests/                     Unit tests
+src/main.py                CLI 和主流程编排
+src/web_app.py             Flask Web UI 与 SSE 进度推送
+src/config.py              .env 加载与 LLM 配置校验
+src/arxiv_client.py        arXiv ID / PDF URL / 本地 PDF 解析
+src/pdf_downloader.py      PDF 下载与缓存跳过
+src/markdown_converter.py  MarkItDown 转换
+src/splitter.py            Markdown 文本切分
+src/llm_client.py          OpenAI-compatible chat client 与重试逻辑
+src/summarizer.py          Map 阶段分块摘要
+src/script_writer.py       Reduce 阶段生成最终脚本
+src/image_generator.py     ComfyUI workflow 与跨学科封面 prompt
+src/voice_generator.py     可选音频生成
+src/media_config.py        媒体服务配置
+tests/                     单元测试
 ```
