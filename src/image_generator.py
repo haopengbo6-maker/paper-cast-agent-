@@ -14,7 +14,7 @@ from .media_config import ImageProviderConfig
 from .utils import read_text
 
 
-COVER_PROMPT_VERSION = "v10"
+COVER_PROMPT_VERSION = "v11"
 
 _TITLE_HEADINGS = ("# 播报标题", "# 标题", "# title")
 _SCRIPT_HEADINGS = ("# 播报脚本", "# 脚本", "# script")
@@ -175,6 +175,8 @@ def build_sdxl_workflow(checkpoint: str, positive_prompt: str, output_prefix: st
                     "photorealistic, 3d render, glossy plastic, metallic chrome, device interface, "
                     "control panel, cassette, screen UI, sci-fi dashboard, neon cyberpunk poster, "
                     "cluttered random objects, many spheres, orbit rings, planets, fractal pattern, maze, "
+                    "human skeleton, bones, skull, rib cage, anatomical skeleton, anatomy chart, medical skeleton, "
+                    "house, building, village, city street, residential architecture, interior room, roof, window, "
                     "circuit board texture, repetitive stripes, meaningless abstraction, decorative wallpaper, "
                     "Chinese characters, Chinese calligraphy, ink painting, Chinese landscape, "
                     "landscape painting, mountains, river, lake, pagoda, temple, boat, cherry blossom, "
@@ -309,7 +311,7 @@ def _infer_topic_visual_terms(title: str, keywords: str, summary_hint: str = "",
                 "embodied intelligence", "embodied ai", "robot locomotion", "robot manipulation", "robot grasping",
                 "whole-body control", "kinematics", "humanoid motion",
             ),
-            "a front-facing humanoid robot with clear head, torso, arms, hands, hips, knees and feet, show articulated joints and human-like proportions rather than a generic machine, place the figure in a calm research-lab or motion-analysis setting with floor markers, reference lines, or a test rig, emphasize locomotion, balance, reach, grasp, and whole-body control, use one central readable pose, subtle mechanical silhouette, and a sense of embodied intelligence",
+            "a clearly mechanical humanoid robot, not a human body and not a skeleton, with visible metal or composite outer shell panels, servo motors, cable hints, actuator joints, robotic hands, biped legs, sensor head, balance markers, motion-capture floor lines, trajectory arrows, and a lab test rig; show robotics locomotion and whole-body control as one readable engineering diagram; avoid bones, skull, rib cage, anatomical skeleton, human anatomy, mannequin, medical illustration",
         ),
         (
             (
@@ -317,102 +319,109 @@ def _infer_topic_visual_terms(title: str, keywords: str, summary_hint: str = "",
                 "image recognition", "object detection", "segmentation", "pose estimation", "visual grounding",
                 "multimodal", "diffusion", "image synthesis", "generative vision",
             ),
-            "layered image patches, bounding boxes, heatmaps, segmentation contours, cross-attention traces, sample thumbnails, and a clear vision-research diagram with one focal object",
+            "must show computer-vision evidence: image patch grid, bounding boxes around one focal object, segmentation mask contours, heatmap overlay, camera or dataset thumbnail strip, and attention arrows; must not show generic neon UI, random screens, city scenery, or decorative circuits",
         ),
         (
             (
                 "llm", "\u5927\u8bed\u8a00\u6a21\u578b", "\u8bed\u8a00\u6a21\u578b", "\u63d0\u793a\u8bcd", "\u5bf9\u9f50",
                 "large language model", "language model", "instruction tuning", "alignment", "transformer", "token", "reasoning", "prompt", "rlhf",
             ),
-            "a text-and-token research diagram with stacked attention bands, prompt blocks, arrowed token flow, and a calm editorial layout around a central language-model schematic",
+            "must show language-model structure: token tiles flowing through transformer layers, attention heads as aligned bands, prompt block to response block, embedding grid and evaluation chart; must not show a robot face, brain, magic book, chat app screenshot, or random text typography",
         ),
         (
             (
                 "medical", "\u533b\u5b66", "\u4e34\u5e8a", "\u75c5\u7406", "\u653e\u5c04", "\u624b\u672f", "\u8bca\u65ad",
                 "clinical", "radiology", "pathology", "medical image", "healthcare", "disease", "diagnosis", "surgery", "anatomy", "biomedical", "bioimaging", "bioinformatics", "genomics", "proteomics",
             ),
-            "a clinical paper plate with scan-like silhouettes, diagnostic overlays, anatomical contours, restrained chart markings, and a sober research-lab atmosphere",
+            "must show medical research evidence: radiology scan slice or pathology slide, diagnostic overlay contours, organ or tissue silhouette, measurement markers, and clinical chart traces; must not show generic hospital room, doctor portrait, bones unless the paper is explicitly about bones, or sci-fi device panels",
         ),
         (
             (
                 "physics", "\u91cf\u5b50", "\u5149\u5b66", "\u70ed\u529b\u5b66", "\u7edf\u8ba1\u7269\u7406", "\u6ce2\u51fd\u6570",
                 "quantum", "mechanics", "optics", "wave", "field theory", "particles", "thermodynamics", "statistical physics", "astronomy", "astrophysics",
             ),
-            "a physics plate with fields, trajectories, wave fronts, equation fragments, and a clean diagrammatic composition with measured scientific tension",
+            "must show physics primitives: field lines, particle or ray trajectories, wave fronts, coordinate axes, contour curves, and minimal equation fragments as marks without readable text; must not show fantasy space art, houses, landscapes, random planets, or decorative spirals",
         ),
         (
             (
                 "materials", "\u6750\u6599", "\u6676\u4f53", "\u805a\u5408\u7269", "\u534a\u5bfc\u4f53", "\u7535\u6c60", "\u50ac\u5316",
                 "material", "crystal", "polymer", "nanomaterial", "semiconductor", "battery", "electrode", "catalyst", "surface", "microstructure",
             ),
-            "layered material cross-sections, lattice hints, grain boundaries, surface textures, and a restrained lab diagram with specimen-like clarity",
+            "must show materials-science objects: crystal lattice unit cells, layered cross-section, grain boundaries, microscope inset, surface texture, electrode or catalyst interface when relevant; must not show buildings, furniture, human skeleton, generic circuit board wallpaper, or abstract marble pattern",
         ),
         (
             (
                 "biology", "\u751f\u7269", "\u57fa\u56e0", "\u86cb\u767d", "\u7ec6\u80de", "\u5206\u5b50", "\u795e\u7ecf\u79d1\u5b66",
                 "genomics", "protein", "cell", "molecule", "molecular", "neuroscience", "gene", "pathway", "biochemical", "bioinformatics",
             ),
-            "a life-science plate with cellular forms, molecular traces, pathway arcs, and a clean microscope-like composition with biological layering",
+            "must show life-science objects: cells under microscope, protein or DNA-like molecular traces, pathway arrows, membrane layers, assay wells or gene-expression chart; must not show human skeleton, full-body anatomy, hospital room, garden landscape, or random organic blobs without labels",
         ),
         (
             (
                 "economics", "\u7ecf\u6d4e", "\u91d1\u878d", "\u793e\u4f1a", "\u653f\u7b56", "\u884c\u4e3a", "\u8c03\u67e5",
                 "finance", "market", "social", "sociology", "policy", "behavior", "survey", "education", "humanities", "politics", "psychology",
             ),
-            "an analytical editorial plate with charts, abstract human-scale markers, timeline bands, and a restrained social-research composition",
+            "must show social-science evidence: survey nodes, population markers, bar or line charts, timeline bands, policy feedback arrows, map-like region blocks; must not show office buildings, courtroom, money piles, portraits, city skyline, or generic infographic icons only",
+        ),
+        (
+            (
+                "geomagnetic storm", "geomagnetic", "magnetic storm", "space weather", "solar storm", "solar wind", "magnetosphere", "ionosphere", "aurora", "coronal mass ejection", "cme",
+                "\u5730\u78c1\u66b4", "\u5730\u78c1", "\u7a7a\u95f4\u5929\u6c14", "\u592a\u9633\u98ce", "\u78c1\u5c42", "\u7535\u79bb\u5c42", "\u6781\u5149", "\u65e5\u5195\u7269\u8d28\u629b\u5c04",
+            ),
+            "a space-weather science plate: the Sun on the left emitting solar wind and coronal mass ejection arcs, charged particle streams flowing toward Earth, Earth's magnetosphere drawn as protective curved magnetic field lines, aurora oval near the poles, satellite orbit markers and small magnetometer graph traces; one clear scientific diagram, no houses, no buildings, no street scene, no landscape painting",
         ),
         (
             (
                 "climate", "\u6c14\u5019", "\u5929\u6c14", "\u5730\u7403", "\u6d77\u6d0b", "\u751f\u6001", "\u9065\u611f",
                 "weather", "earth", "geology", "ocean", "environment", "ecology", "remote sensing", "urban", "hydrology", "sustainability", "carbon",
             ),
-            "an earth-system plate with topographic bands, atmospheric layers, contour maps, and a measured environmental-research composition",
+            "must show earth-system evidence: contour map, atmospheric layers, topographic bands, ocean or land mask, sensor swath or remote-sensing grid, climate variable chart; must not show houses, villages, roads, travel poster scenery, mountains as pure landscape, or cozy architecture",
         ),
         (
             (
                 "energy", "\u80fd\u6e90", "\u7535\u529b", "\u7535\u7f51", "renewable", "solar", "wind", "photovoltaic", "storage system", "grid",
             ),
-            "layered energy-system diagrams, grid lines, power flow arrows, solar and wind motifs, and a technical sustainability plate",
+            "must show energy-system components: power grid nodes, transmission lines, power-flow arrows, solar panel cells, wind turbine silhouette, battery/storage block, load curve chart; must not show houses as the main subject, residential street, generic city skyline, or decorative lightning only",
         ),
         (
             (
                 "systems", "\u7cfb\u7edf", "\u7f51\u7edc", "\u5206\u5e03\u5f0f", "\u901a\u4fe1", "\u8c03\u5ea6", "\u6570\u636e\u5e93",
                 "network", "distributed", "communication", "scheduling", "database", "storage", "compiler", "operating system", "architecture", "algorithm", "infrastructure",
             ),
-            "modular blocks, routing lines, stack layers, system-call or pipeline diagrams, and a clean archival-technical plate composition",
+            "must show computing-system structure: labeled-looking but unreadable modular blocks, routing lines, stack layers, queue or scheduler lanes, database cylinder abstraction, pipeline arrows; must not show physical buildings, city networks, circuit-board wallpaper, or random glowing dashboards",
         ),
         (
             (
                 "control", "\u63a7\u5236", "\u5f3a\u5316\u5b66\u4e60", "\u89c4\u5212", "\u8f68\u8ff9", "\u4f18\u5316",
                 "reinforcement learning", "rl", "robot learning", "planning", "policy", "control theory", "trajectory", "optimization",
             ),
-            "trajectory lines, control curves, policy arrows, state-to-action diagrams, and a disciplined technical composition with one visible system loop",
+            "must show control-system evidence: closed feedback loop, state-to-action arrows, trajectory curves, policy surface, controller block, robot or dynamic system silhouette when relevant; must not show generic math scribbles only, human skeleton, house, or unrelated abstract maze",
         ),
         (
             (
                 "chemistry", "\u5316\u5b66", "\u5206\u5b50\u53cd\u5e94", "\u5408\u6210", "\u50ac\u5316\u53cd\u5e94", "reaction", "synthesis", "molecular interaction", "spectroscopy",
             ),
-            "chemical bonds, reaction pathways, molecule contours, catalyst surfaces, and a restrained lab plate with analytical diagram logic",
+            "must show chemistry evidence: molecular structures, bond angles, reaction pathway arrows, catalyst surface, spectroscopy trace or energy profile curve, flask only as small context if needed; must not show kitchen, medicine bottle, random bubbles, or decorative floral pattern",
         ),
         (
             (
                 "math", "\u6570\u5b66", "\u5b9a\u7406", "\u8bc1\u660e", "\u4ee3\u6570", "\u51e0\u4f55", "\u62d3\u6251", "\u77e9\u9635", "\u6982\u7387", "\u7edf\u8ba1",
                 "graph theory", "linear algebra", "calculus", "theorem", "proof", "matrix", "spectral",
             ),
-            "clean mathematical diagrams, theorem blocks, geometric constructions, matrix grids, contour curves, and a disciplined abstract research plate",
+            "must show mathematical objects: geometric construction lines, graph nodes and edges, matrix grid, contour curves, probability distribution, theorem-proof blocks as unreadable marks; must not show buildings, books as main subject, chalkboard classroom, or generic equations filling the page",
         ),
         (
             (
                 "law", "\u6cd5\u5f8b", "\u6cd5\u5b66", "\u53f8\u6cd5", "\u6cd5\u5ead", "\u5408\u89c4",
                 "regulation", "legal", "court", "justice", "policy analysis",
             ),
-            "editorial legal-document composition, scales of justice, citation bands, document blocks, and a formal institutional research plate",
+            "must show legal-research evidence: document stacks, citation bands, regulation flowchart, balance-scale silhouette, case timeline, institutional seal-like abstract mark; must not show courthouse building as the main scene, judge portrait, prison, city street, or ancient parchment style",
         ),
         (
             (
                 "agriculture", "\u519c\u4e1a", "\u4f5c\u7269", "\u571f\u58e4", "planting", "crop", "yield", "farm", "irrigation", "remote farming",
             ),
-            "field contour lines, crop rows, soil layers, irrigation traces, and a grounded agricultural research plate",
+            "must show agricultural research evidence: crop-row geometry, soil-layer cross-section, root or leaf sample, irrigation flow lines, sensor markers, yield chart; must not show farmhouse, barn, rural landscape painting, sunset field scenery, or decorative plants only",
         ),
     ]
     for terms, description in topic_blocks:

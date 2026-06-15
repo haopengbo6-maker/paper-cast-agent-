@@ -63,7 +63,7 @@ class ImageGeneratorTests(unittest.TestCase):
 
         self.assertIn("script cue", prompt)
         self.assertIn("\u4eba\u5f62\u673a\u5668\u4eba", prompt)
-        self.assertIn("articulated joints", prompt)
+        self.assertIn("actuator joints", prompt)
 
     def test_build_cover_prompt_keeps_flow_matching_cover_on_topic(self):
         script = (
@@ -138,7 +138,7 @@ class ImageGeneratorTests(unittest.TestCase):
                 force=True,
             )
 
-            self.assertEqual(path, Path(tmp) / "paper_cover_v10.png")
+            self.assertEqual(path, Path(tmp) / "paper_cover_v11.png")
             self.assertEqual(path.read_bytes(), b"\x89PNG\r\n\x1a\nimage")
             self.assertEqual(calls[0][0], "http://local")
             self.assertEqual(calls[0][2], 9)
@@ -168,7 +168,7 @@ class ImageGeneratorTests(unittest.TestCase):
                 force=True,
             )
 
-            self.assertEqual(path, Path(tmp) / "flow_machine_cover_v10.png")
+            self.assertEqual(path, Path(tmp) / "flow_machine_cover_v11.png")
             self.assertTrue(path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"))
             self.assertIn("messy line art", calls[0]["prompt"])
             self.assertIn("colored pencil sketch", calls[0]["prompt"])
@@ -180,7 +180,7 @@ class ImageGeneratorTests(unittest.TestCase):
     def test_cover_image_path_includes_prompt_version(self):
         self.assertEqual(
             cover_image_path(Path("images"), "paper"),
-            Path("images") / "paper_cover_v10.png",
+            Path("images") / "paper_cover_v11.png",
         )
 
     def test_selects_first_available_comfyui_checkpoint(self):
@@ -219,7 +219,7 @@ class ImageGeneratorTests(unittest.TestCase):
 
         prompt = build_cover_prompt(script)
 
-        self.assertIn("physics plate", prompt)
+        self.assertIn("physics primitives", prompt)
         self.assertIn("wave fronts", prompt)
         self.assertIn("equation fragments", prompt)
 
@@ -236,9 +236,9 @@ class ImageGeneratorTests(unittest.TestCase):
 
         prompt = build_cover_prompt(script)
 
-        self.assertIn("analytical editorial plate", prompt)
+        self.assertIn("social-science evidence", prompt)
         self.assertIn("timeline bands", prompt)
-        self.assertIn("social-research composition", prompt)
+        self.assertIn("policy feedback arrows", prompt)
 
     def test_build_cover_prompt_handles_chinese_medical_topic(self):
         script = (
@@ -252,9 +252,9 @@ class ImageGeneratorTests(unittest.TestCase):
 
         prompt = build_cover_prompt(script)
 
-        self.assertIn("clinical paper plate", prompt)
-        self.assertIn("diagnostic overlays", prompt)
-        self.assertIn("anatomical contours", prompt)
+        self.assertIn("medical research evidence", prompt)
+        self.assertIn("diagnostic overlay contours", prompt)
+        self.assertIn("organ or tissue silhouette", prompt)
 
     def test_build_cover_prompt_handles_chinese_materials_topic(self):
         script = (
@@ -268,8 +268,8 @@ class ImageGeneratorTests(unittest.TestCase):
 
         prompt = build_cover_prompt(script)
 
-        self.assertIn("layered material cross-sections", prompt)
-        self.assertIn("lattice hints", prompt)
+        self.assertIn("materials-science objects", prompt)
+        self.assertIn("crystal lattice unit cells", prompt)
         self.assertIn("grain boundaries", prompt)
 
     def test_build_cover_prompt_handles_math_topic(self):
@@ -285,9 +285,9 @@ class ImageGeneratorTests(unittest.TestCase):
 
         prompt = build_cover_prompt(script)
 
-        self.assertIn("clean mathematical diagrams", prompt)
-        self.assertIn("theorem blocks", prompt)
-        self.assertIn("matrix grids", prompt)
+        self.assertIn("mathematical objects", prompt)
+        self.assertIn("theorem-proof blocks", prompt)
+        self.assertIn("matrix grid", prompt)
 
     def test_build_cover_prompt_handles_law_topic(self):
         script = (
@@ -301,8 +301,8 @@ class ImageGeneratorTests(unittest.TestCase):
 
         prompt = build_cover_prompt(script)
 
-        self.assertIn("editorial legal-document composition", prompt)
-        self.assertIn("scales of justice", prompt)
+        self.assertIn("legal-research evidence", prompt)
+        self.assertIn("balance-scale silhouette", prompt)
         self.assertIn("citation bands", prompt)
 
     def test_build_cover_prompt_handles_energy_topic(self):
@@ -318,9 +318,9 @@ class ImageGeneratorTests(unittest.TestCase):
 
         prompt = build_cover_prompt(script)
 
-        self.assertIn("layered energy-system diagrams", prompt)
-        self.assertIn("power flow arrows", prompt)
-        self.assertIn("technical sustainability plate", prompt)
+        self.assertIn("energy-system components", prompt)
+        self.assertIn("power-flow arrows", prompt)
+        self.assertIn("battery/storage block", prompt)
 
     def test_build_cover_prompt_accepts_english_headings(self):
         script = (
@@ -336,8 +336,73 @@ class ImageGeneratorTests(unittest.TestCase):
 
         self.assertIn("Generic paper title", prompt)
         self.assertIn("earth observation", prompt)
-        self.assertIn("earth-system plate", prompt)
+        self.assertIn("earth-system evidence", prompt)
         self.assertIn("topographic bands", prompt)
+
+    def test_build_cover_prompt_prevents_robot_skeleton_mismatch(self):
+        script = (
+            TITLE
+            + "\u4eba\u5f62\u673a\u5668\u4eba\u7684\u5168\u8eab\u63a7\u5236\u7814\u7a76\n\n"
+            + SCRIPT
+            + "\u8fd9\u7bc7\u8bba\u6587\u8ba8\u8bba\u4eba\u5f62\u673a\u5668\u4eba\u7684\u53cc\u8db3\u884c\u8d70\u3001\u4f3a\u670d\u5173\u8282\u548c\u5168\u8eab\u5e73\u8861\u63a7\u5236\u3002\n"
+            + KEYWORDS
+            + "- humanoid robot\n"
+        )
+
+        prompt = build_cover_prompt(script)
+
+        self.assertIn("clearly mechanical humanoid robot", prompt)
+        self.assertIn("servo motors", prompt)
+        self.assertIn("not a skeleton", prompt)
+        self.assertIn("avoid bones", prompt)
+
+    def test_build_cover_prompt_handles_geomagnetic_storm_topic(self):
+        script = (
+            TITLE
+            + "\u5730\u78c1\u66b4\u4e0e\u7a7a\u95f4\u5929\u6c14\u9884\u6d4b\n\n"
+            + SCRIPT
+            + "\u8fd9\u7bc7\u8bba\u6587\u5206\u6790\u592a\u9633\u98ce\u3001\u78c1\u5c42\u6270\u52a8\u3001\u7535\u79bb\u5c42\u54cd\u5e94\u548c\u6781\u5149\u6d3b\u52a8\u3002\n"
+            + KEYWORDS
+            + "- geomagnetic storm\n"
+        )
+
+        prompt = build_cover_prompt(script)
+
+        self.assertIn("space-weather science plate", prompt)
+        self.assertIn("solar wind", prompt)
+        self.assertIn("magnetosphere", prompt)
+        self.assertIn("no houses", prompt)
+        self.assertIn("no buildings", prompt)
+
+    def test_build_cover_prompt_discourages_house_for_agriculture(self):
+        script = (
+            TITLE
+            + "\u519c\u4e1a\u4f5c\u7269\u4ea7\u91cf\u4e0e\u571f\u58e4\u4f20\u611f\u7814\u7a76\n\n"
+            + SCRIPT
+            + "\u8fd9\u7bc7\u8bba\u6587\u7814\u7a76\u4f5c\u7269\u3001\u571f\u58e4\u5206\u5c42\u3001\u704c\u6e89\u4e0e\u4ea7\u91cf\u9884\u6d4b\u3002\n"
+            + KEYWORDS
+            + "- agriculture\n"
+        )
+
+        prompt = build_cover_prompt(script)
+
+        self.assertIn("crop-row geometry", prompt)
+        self.assertIn("soil-layer cross-section", prompt)
+        self.assertIn("must not show farmhouse", prompt)
+        self.assertIn("rural landscape painting", prompt)
+
+    def test_negative_prompt_blocks_common_mismatches(self):
+        workflow = build_sdxl_workflow(
+            checkpoint="sd_xl_base_1.0.safetensors",
+            positive_prompt="cover",
+            output_prefix="out",
+        )
+        negative = workflow["7"]["inputs"]["text"]
+
+        self.assertIn("human skeleton", negative)
+        self.assertIn("house", negative)
+        self.assertIn("building", negative)
+        self.assertIn("residential architecture", negative)
 
     def test_build_sdxl_workflow_uses_checkpoint_and_prompt(self):
         workflow = build_sdxl_workflow(
