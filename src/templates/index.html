@@ -181,8 +181,8 @@ button, input { font: inherit; }
 .hero-copy-side,
 .hero-plate-side {
   position: relative;
-  min-height: 420px;
-  padding: clamp(34px, 5vw, 60px);
+  min-height: 280px;
+  padding: clamp(28px, 4vw, 48px);
 }
 
 .hero-copy-side {
@@ -332,7 +332,7 @@ button, input { font: inherit; }
 
 .studio-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.72fr);
+  grid-template-columns: 1fr;
   gap: 24px;
   align-items: start;
 }
@@ -384,20 +384,6 @@ button, input { font: inherit; }
   box-shadow: 7px 0 0 -2px #c9aa76;
 }
 
-.coffee-note {
-  margin: 22px 28px 0;
-  padding: 16px 18px;
-  border: 1px solid rgb(255 240 204 / 0.22);
-  border-radius: 0;
-  background: rgb(75 53 41 / 0.7);
-  color: #f8e2bd;
-  line-height: 1.85;
-  font-size: 0.96rem;
-  position: relative;
-  z-index: 1;
-  font-family: var(--font-body);
-  font-weight: 500;
-}
 
 .coffee-menu {
   margin: 22px 28px 28px;
@@ -506,7 +492,7 @@ button, input { font: inherit; }
 }
 
 .window-buttons::after {
-  content: "portable receiver · papercast";
+  content: "academic broadcast receiver";
   margin-left: 8px;
   color: #7b5c46;
   font-family: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
@@ -681,7 +667,7 @@ button, input { font: inherit; }
 }
 .mode-option span {
   display: block;
-  min-height: 106px;
+  min-height: 72px;
   padding: 1rem;
   border: 2px solid #1b120d;
   border-radius: 0;
@@ -741,7 +727,7 @@ button, input { font: inherit; }
 }
 
 .record-bay::before {
-  content: "QUEUE";
+  content: "录入队列";
   display: inline-flex;
   min-height: 30px;
   align-items: center;
@@ -800,13 +786,6 @@ button, input { font: inherit; }
   transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
 }
 
-.pixel-btn::before {
-  content: "REC";
-  margin-right: 8px;
-  color: #ffd9bd;
-  font-family: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
-  font-size: 0.76rem;
-}
 .pixel-btn:hover { filter: brightness(1.05); transform: translateY(-2px); }
 .pixel-btn:active {
   transform: translateY(4px);
@@ -894,12 +873,12 @@ button, input { font: inherit; }
   counter-reset: catalog-step;
 }
 .step-item {
-  min-height: 38px;
+  min-height: 28px;
   display: flex;
   align-items: center;
   gap: 8px;
   border-bottom: 1px solid rgb(92 68 49 / 0.35);
-  padding: 0.55rem 0.2rem;
+  padding: 0.35rem 0.2rem;
   background: transparent;
   color: var(--muted);
   font-size: 0.9rem;
@@ -954,156 +933,217 @@ button, input { font: inherit; }
 
 #output-section {
   display: none;
-  margin-top: 28px;
+}
+#output-section.revealed {
+  display: block;
+  animation: output-fade-in 0.6s ease;
+}
+@keyframes output-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
+/* ── Page 1: Cover (fixed, fills viewport) ── */
+.cover-hero {
+  position: fixed; inset: 0; z-index: 0;
+  background: transparent; overflow: visible;
+}
+.cover-hero::before {
+  content: "Plate 01"; position: absolute; left: 24px; top: 14px; z-index: 3;
+  color: rgb(255 250 240 / 0.55); font-family: var(--font-mono);
+  font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; pointer-events: none;
+}
+.cover-hero .image-download {
+  position: absolute; right: 24px; bottom: 22px; z-index: 3;
+  display: inline-flex; align-items: center; min-height: 36px;
+  border: 1px solid rgb(255 250 240 / 0.4); border-radius: 999px;
+  padding: 0.5rem 0.9rem; color: rgb(255 250 240 / 0.75);
+  text-decoration: none; background: rgb(0 0 0 / 0.35);
+  font-family: var(--font-mono); font-size: 0.78rem;
+}
+.cover-hero .image-download:hover { background: #9d4f35; color: #fff7e7; }
+.cover-hero-img {
+  transition: opacity 0.8s ease;
+  display: block; width: 100%; height: 120vh;
+  object-fit: cover;
+  mask-image: linear-gradient(to bottom, black 55%, transparent 95%);
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 95%);
+}
+.cover-hero.hidden { display: none; }
+
+/* Cover transition: subtle zoom-out as content covers it */
+.cover-hero-img.transitioning {
+  transform: scale(1.05); opacity: 0.3; transition: transform 0.8s ease, opacity 0.8s ease;
+}
+
+.scroll-hint {
+  position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 3;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: rgb(255 250 240 / 0.45); font-family: var(--font-ui); font-size: 0.78rem;
+  letter-spacing: 0.08em; pointer-events: none;
+}
+.scroll-arrow { animation: scroll-bounce 1.6s ease-in-out infinite; font-size: 1.1rem; }
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+
+/* ── Page 2: slides over the fixed cover ── */
 .broadcast-post {
+  margin-top: 100dvh;
+  margin-bottom: 90px;
+  transition: margin-top 0.5s ease;
+  position: relative; z-index: 1;
+  background: transparent;
   border: 4px solid #1b120d;
   border-radius: 10px;
-  background:
-    linear-gradient(180deg, rgb(244 228 197 / 0.98), rgb(234 211 169 / 0.98)),
-    #f0ddb8;
   color: var(--ink);
-  box-shadow: 12px 14px 0 #1a120e, inset 0 1px 0 rgb(255 250 240 / 0.35);
-  overflow: hidden;
-  position: relative;
+  box-shadow: 12px 14px 0 #1a120e;
+}
+.broadcast-post > * { position: relative; z-index: 1; }
+.broadcast-post.no-cover {
+  margin-top: 0;
 }
 
-.summary-strip {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  padding: 0 28px 24px;
-  background: #f5e2bc;
+.post-body {
+  background: linear-gradient(180deg, #faf3e3, #f2e6ce);
+  border-radius: 0 0 6px 6px;
+  position: relative; z-index: 1;
 }
 
-.catalog-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 18px 32px 0;
-  color: #7c5d47;
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.catalog-meta span:last-child {
-  text-align: right;
-}
-
-.summary-item {
-  padding: 12px 14px;
-  border: 2px solid #a47f57;
-  border-radius: 4px;
-  background: #fff4d9;
-}
-
-.summary-item span {
-  display: block;
-  color: #86664d;
-  font-family: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
-  font-size: 0.78rem;
-  margin-bottom: 4px;
-}
-
-.summary-item b {
-  color: #2a1d17;
-  font-size: 0.98rem;
-}
-
-.broadcast-post::before {
-  content: none;
-}
-
+/* Header: tall hero with cover image as background */
 .broadcast-header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 16px;
-  align-items: start;
-  padding: 30px 32px;
-  border-bottom: 4px solid #b3986d;
-  background:
-    linear-gradient(180deg, #f8eacb, #f2dfba);
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 64px 48px;
+  min-height: 70vh;
+  position: relative; z-index: 2;
+  background: transparent;
 }
+.broadcast-header > * { position: relative; z-index: 1; }
+.broadcast-header .header-text { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.broadcast-kicker {
+  margin: 0 0 12px; color: rgb(255 250 240 / 0.85);
+  font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.16em;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 0.5);
+}
+.broadcast-title {
+  margin: 0; color: #fff7e7; font-family: var(--font-display);
+  font-size: clamp(3rem, 6vw, 5.5rem); line-height: 0.95; letter-spacing: -0.03em;
+  max-width: 16ch;
+  text-shadow: 0 2px 8px rgb(0 0 0 / 0.5);
+}
+.broadcast-subtitle {
+  margin: 18px 0 0; color: rgb(255 250 240 / 0.9);
+  max-width: 48ch; line-height: 1.9; font-size: clamp(1rem, 1.3vw, 1.15rem);
+  text-shadow: 0 1px 4px rgb(0 0 0 / 0.45);
+}
+.blog-actions {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.download-link, .audio-download, .image-download {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 40px; border: 1px solid rgb(255 250 240 / 0.5); border-radius: 999px;
+  padding: 0.55rem 1rem; color: #fff7e7; text-decoration: none;
+  background: rgb(0 0 0 / 0.3); font-family: var(--font-mono);
+  transition: transform 180ms ease, background 180ms ease;
+}
+.download-link:hover, .audio-download:hover, .image-download:hover {
+  background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-1px);
+}
+.download-link:focus-visible, .audio-download:focus-visible,
+.image-download:focus-visible, .pixel-btn:focus-visible {
+  outline: 3px solid #f6c37c; outline-offset: 3px;
+}
+
+
+/* ── Audio visualizer bars ── */
+.audio-visualizer {
+  display: flex; align-items: flex-end; gap: 3px;
+  height: 32px; margin-bottom: 8px;
+}
+.audio-visualizer span {
+  flex: 1; min-width: 3px; background: #b8c06f;
+  border-radius: 2px 2px 0 0;
+  animation: viz-bounce 0.8s ease-in-out infinite alternate;
+}
+.audio-visualizer span:nth-child(1) { animation-delay: 0s; height: 60%; }
+.audio-visualizer span:nth-child(2) { animation-delay: 0.1s; height: 90%; }
+.audio-visualizer span:nth-child(3) { animation-delay: 0.2s; height: 40%; }
+.audio-visualizer span:nth-child(4) { animation-delay: 0.3s; height: 100%; }
+.audio-visualizer span:nth-child(5) { animation-delay: 0.15s; height: 70%; }
+.audio-visualizer span:nth-child(6) { animation-delay: 0.25s; height: 55%; }
+.audio-visualizer span:nth-child(7) { animation-delay: 0.05s; height: 85%; }
+.audio-visualizer span:nth-child(8) { animation-delay: 0.35s; height: 45%; }
+.audio-visualizer span:nth-child(9) { animation-delay: 0.18s; height: 75%; }
+.audio-visualizer span:nth-child(10) { animation-delay: 0.28s; height: 95%; }
+@keyframes viz-bounce {
+  0% { transform: scaleY(0.4); }
+  100% { transform: scaleY(1.0); }
+}
+.audio-visualizer.playing span { animation-play-state: running; }
+.audio-visualizer.paused span { animation-play-state: paused; }
+
+/* ── Sticky audio bar ── */
+.sticky-player {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  display: none; align-items: center; gap: 14px;
+  padding: 10px 20px;
+  background: #1c1410; color: var(--paper);
+  border-top: 2px solid #b3986d;
+  box-shadow: 0 -8px 24px rgb(0 0 0 / 0.4);
+}
+.sticky-player.visible { display: flex; }
+.sticky-play {
+  width: 38px; height: 38px; border: 2px solid var(--paper);
+  border-radius: 50%; background: transparent; color: var(--paper);
+  font-size: 0.85rem; cursor: pointer; display: grid; place-items: center;
+  flex-shrink: 0; transition: background 180ms ease;
+}
+.sticky-play:hover { background: var(--accent); border-color: var(--accent); }
+.sticky-cover {
+  width: 36px; height: 36px; border-radius: 3px;
+  background-size: cover; background-position: center;
+  background-color: #2a1d17; flex-shrink: 0;
+}
+.sticky-info { flex: 1; min-width: 0; }
+.sticky-title { display: block; font-size: 0.88rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sticky-wave { display: flex; align-items: flex-end; gap: 2px; height: 16px; margin-top: 4px; }
+.sticky-wave span { flex: 1; min-width: 2px; background: var(--accent); border-radius: 1px 1px 0 0; animation: viz-bounce 0.6s ease-in-out infinite alternate; }
+.sticky-wave span:nth-child(1) { animation-delay: 0s; height: 50%; }
+.sticky-wave span:nth-child(2) { animation-delay: 0.08s; height: 80%; }
+.sticky-wave span:nth-child(3) { animation-delay: 0.16s; height: 35%; }
+.sticky-wave span:nth-child(4) { animation-delay: 0.24s; height: 90%; }
+.sticky-wave span:nth-child(5) { animation-delay: 0.12s; height: 60%; }
+.sticky-wave span:nth-child(6) { animation-delay: 0.2s; height: 45%; }
+.sticky-wave span:nth-child(7) { animation-delay: 0.04s; height: 75%; }
+.sticky-wave span:nth-child(8) { animation-delay: 0.28s; height: 40%; }
+.sticky-wave span:nth-child(9) { animation-delay: 0.14s; height: 85%; }
+.sticky-wave span:nth-child(10) { animation-delay: 0.22s; height: 55%; }
+.sticky-wave span:nth-child(11) { animation-delay: 0.06s; height: 70%; }
+.sticky-wave span:nth-child(12) { animation-delay: 0.18s; height: 50%; }
+.sticky-wave span:nth-child(13) { animation-delay: 0.1s; height: 65%; }
+.sticky-wave span:nth-child(14) { animation-delay: 0.26s; height: 80%; }
+.sticky-wave span:nth-child(15) { animation-delay: 0.3s; height: 45%; }
+.sticky-time { font-family: var(--font-mono); font-size: 0.8rem; flex-shrink: 0; }
+
+/* Script improvements */
+.script-content p { margin: 0 0 1.4rem; text-indent: 0; }
+.script-content p + p { text-indent: 0; }
 
 .catalog-foot {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   padding: 14px 32px 24px;
-  border-top: 1px solid rgb(109 81 59 / 0.24);
-  color: #7c5d47;
+  border-top: 1px solid rgb(0 0 0 / 0.08);
+  color: #5a3d2e;
   font-family: var(--font-mono);
   font-size: 0.74rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-}
-
-.broadcast-kicker {
-  margin: 0 0 10px;
-  color: #8b654e;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  letter-spacing: 0.18em;
-}
-
-.broadcast-title {
-  margin: 0;
-  color: #2a1d17;
-  font-size: clamp(2.4rem, 5vw, 4.8rem);
-  line-height: 0.98;
-  letter-spacing: -0.03em;
-  text-wrap: balance;
-  font-family: var(--font-display);
-}
-
-.broadcast-subtitle {
-  margin: 14px 0 0;
-  color: #6f5848;
-  max-width: 54ch;
-  line-height: 1.8;
-  font-family: var(--font-body);
-}
-
-.blog-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  align-items: flex-start;
-}
-
-.download-link,
-.audio-download,
-.image-download {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  border: 2px solid #6f563e;
-  border-radius: 999px;
-  padding: 0.55rem 0.95rem;
-  color: #3b261b;
-  text-decoration: none;
-  background: #f8eacb;
-  transition: transform 180ms ease, background 180ms ease;
-  font-family: var(--font-mono);
-}
-.download-link:hover,
-.audio-download:hover,
-.image-download:hover {
-  background: #9d4f35;
-  color: #fff7e7;
-  transform: translateY(-1px);
-}
-.download-link:focus-visible,
-.audio-download:focus-visible,
-.image-download:focus-visible,
-.pixel-btn:focus-visible {
-  outline: 3px solid #f6c37c;
-  outline-offset: 3px;
+  background: rgb(255 250 240 / 0.35);
 }
 
 .player-layout {
@@ -1118,16 +1158,17 @@ button, input { font: inherit; }
 .album-side {
   padding: 28px;
   border-right: 4px solid #b3986d;
-  background:
-    linear-gradient(180deg, rgb(231 213 175 / 0.96), rgb(223 200 154 / 0.96)),
-    #e3cfa8;
+  background: rgb(231 213 175 / 0.45);
+  backdrop-filter: blur(2px);
 }
 
+#image-section,
 #audio-section,
 #warning-section {
   display: none;
 }
 
+.image-card,
 .audio-card,
 .warning-card {
   display: grid;
@@ -1144,43 +1185,57 @@ button, input { font: inherit; }
   font-size: 0.85rem;
 }
 
-/* ── Cover thumbnail in sidebar ── */
-#image-section {
-  display: none;
-}
-
-.image-card {
-  display: grid;
-  gap: 14px;
-  position: relative;
-  z-index: 1;
-}
-
-.cover-mini-frame {
+.cover-frame {
   aspect-ratio: 1;
+  padding: 30px 30px 24px;
   border: 1px solid #6d513b;
-  background: #f7edd5;
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, #fff9eb, #f2e0ba);
+  box-shadow: 8px 10px 0 #b3986d, inset 0 0 0 14px rgb(255 255 255 / 0.42);
   position: relative;
 }
 
-.cover-mini-frame::before {
+.cover-frame::before {
   content: "Plate 01";
   position: absolute;
-  left: 10px;
-  top: 6px;
-  z-index: 1;
+  left: 24px;
+  top: 10px;
   color: #8b654e;
   font-family: var(--font-mono);
-  font-size: 0.64rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cover-frame::after {
+  content: "framed research plate";
+  position: absolute;
+  right: 24px;
+  bottom: 10px;
+  color: #8b654e;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-.cover-mini-img {
+.cover-image {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
+  border: 1px solid rgb(37 24 20 / 0.2);
+  border-radius: 0;
+  background: #f7edd5;
+}
+
+.plate-caption {
+  margin: 2px 0 0;
+  color: #7c5d47;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  line-height: 1.5;
 }
 
 .plate-details {
@@ -1209,15 +1264,24 @@ button, input { font: inherit; }
 }
 
 .cover-placeholder {
+  aspect-ratio: 1;
   display: grid;
   place-items: center;
-  padding: 2rem 1.5rem;
+  padding: 2rem;
   text-align: center;
   color: #7d604c;
-  border: 2px dashed #b3986d;
+  border: 3px dashed #8a7059;
+  border-radius: 0;
   background: #fff1cf;
-  font-size: 0.88rem;
-  line-height: 1.6;
+}
+
+.cover-placeholder::before {
+  content: "封面图版";
+  display: block;
+  margin-bottom: 12px;
+  color: #9d4f35;
+  font-family: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+  font-weight: 800;
 }
 
 .lcd-player {
@@ -1255,34 +1319,18 @@ button, input { font: inherit; }
 
 .transcript-side {
   padding: clamp(24px, 4vw, 46px);
-  background:
-    linear-gradient(90deg, rgb(139 101 78 / 0.16) 0 1px, transparent 1px),
-    linear-gradient(180deg, rgb(252 240 214 / 0.99), rgb(244 223 183 / 0.98)),
-    #f8eacb;
-  background-size: 34px 100%, auto, auto;
-  position: relative;
-  isolation: isolate;
+  background: rgb(252 240 214 / 0.5);
+  backdrop-filter: blur(2px);
+  position: relative; isolation: isolate;
 }
-
-/* Cover image as faded background behind the script */
+/* Cover as faded background behind the script */
 .transcript-side::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.08;
-  background-image: var(--cover-bg, none);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  pointer-events: none;
+  content: ""; position: absolute; inset: 0; z-index: 0;
+  opacity: 0.15; background-image: var(--cover-bg, none);
+  background-size: contain; background-position: center;
+  background-repeat: no-repeat; pointer-events: none;
 }
-
-/* Ensure text content renders above the background cover */
-.transcript-side > * {
-  position: relative;
-  z-index: 1;
-}
+.transcript-side > * { position: relative; z-index: 1; }
 
 .essay-head {
   display: grid;
@@ -1325,7 +1373,7 @@ button, input { font: inherit; }
 }
 
 .script-content {
-  min-height: 420px;
+  min-height: 280px;
   max-height: 760px;
   overflow: auto;
   white-space: pre-wrap;
@@ -1360,14 +1408,14 @@ button, input { font: inherit; }
 .script-content::-webkit-scrollbar-track { background: #e3cfa8; }
 .script-content::-webkit-scrollbar-thumb { background: #8a7059; border-radius: 0; }
 
-.warning-card {
-  margin: 0 28px 24px;
-  padding: 14px 16px;
-  border: 3px solid #91672c;
-  border-radius: 3px;
-  background: #ffe6aa;
-  color: #6f4820;
-  white-space: pre-wrap;
+.warning-inline {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 32px; padding: 10px 16px;
+  border: 1px solid rgb(167 70 50 / 0.35);
+  border-radius: 4px;
+  background: rgb(167 70 50 / 0.12);
+  color: #f0c8a0; font-size: 0.88rem;
+  font-family: var(--font-ui);
 }
 
 .confetti-container {
@@ -1386,6 +1434,21 @@ button, input { font: inherit; }
   from { transform: translateY(-10px) rotate(0deg); opacity: 1; }
   to { transform: translateY(100vh) rotate(540deg); opacity: 0; }
 }
+
+/* ── Horizontal info strip (below form) ── */
+.info-strip {
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  padding: 14px 20px;
+  border: 1px solid rgb(109 81 59 / 0.32);
+  border-radius: 4px;
+  background: rgb(44 31 25 / 0.75);
+  font-size: 0.85rem; color: #c4a97d;
+}
+.info-strip-item strong { color: #f0dbb0; margin-right: 4px; }
+.info-strip-item span { color: #b19871; }
+.info-strip-status { display: flex; gap: 6px; align-items: center; }
+.info-strip-status span { font-family: var(--font-mono); font-size: 0.72rem; color: #9e896e; }
+.info-strip-status b { font-weight: 700; color: #dac29b; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -1406,20 +1469,17 @@ button, input { font: inherit; }
   .hero-plate-side {
     min-height: 0;
   }
-  .summary-strip {
-    grid-template-columns: 1fr;
-  }
   .input-bay,
   .album-side {
     border-right: 0;
     border-bottom: 3px solid #5a3f2f;
   }
-  .broadcast-header {
-    grid-template-columns: 1fr;
-  }
   .blog-actions {
     justify-content: flex-start;
   }
+  .cover-hero { height: 100dvh; }
+  .sticky-player { padding: 8px 14px; gap: 10px; }
+  .sticky-cover { width: 30px; height: 30px; }
 }
 
 @media (max-width: 620px) {
@@ -1435,7 +1495,6 @@ button, input { font: inherit; }
   .transcript-side {
     padding: 18px;
   }
-  .summary-strip,
   .status-strip {
     margin-left: 18px;
     margin-right: 18px;
@@ -1450,9 +1509,7 @@ button, input { font: inherit; }
     grid-template-columns: 1fr;
     justify-items: stretch;
   }
-  .pixel-btn {
-    min-height: 56px;
-  }
+  .pixel-btn { min-height: 56px; }
   .essay-head {
     grid-template-columns: 1fr;
     gap: 8px;
@@ -1462,6 +1519,18 @@ button, input { font: inherit; }
     max-height: none;
     padding-right: 0;
   }
+  .cover-hero { height: 100dvh; }
+  .cover-hero::before { left: 12px; top: 8px; font-size: 0.62rem; }
+  .cover-hero .image-download { right: 12px; bottom: 12px; font-size: 0.7rem; padding: 0.4rem 0.7rem; }
+  .scroll-hint { bottom: 16px; font-size: 0.7rem; }
+  .broadcast-header { margin-top: -50px; padding: 20px; }
+  .sticky-player { padding: 6px 12px; gap: 8px; }
+  .sticky-cover { width: 26px; height: 26px; }
+  .sticky-play { width: 32px; height: 32px; font-size: 0.75rem; }
+  .sticky-title { font-size: 0.78rem; }
+  .sticky-wave { height: 12px; }
+  .lcd-player { margin: 10px 0; padding: 12px; }
+  .broadcast-post.no-cover { margin-top: 0; }
 }
 </style>
 </head>
@@ -1495,8 +1564,7 @@ button, input { font: inherit; }
   <section class="studio-grid" aria-label="论文转播客工作台">
     <div class="readme-panel">
       <div class="panel-tab">论文入册</div>
-      <p class="intro-copy">填入 arXiv、PDF 链接或本地论文，系统会先整理中文播报稿；完整模式会继续生成主题封面和语音版本。</p>
-      <div class="coffee-note">快速模式用于先读稿，完整模式用于成稿收藏：封面、音频与脚本会被编排在同一页研究图录中。</div>
+      <p class="intro-copy">填入论文来源，速览模式仅生成脚本快速预览，馆藏模式完整输出封面、音频与可收藏的研究图录。</p>
 
       <div class="device" id="input-card">
         <div class="device-head">
@@ -1542,7 +1610,7 @@ button, input { font: inherit; }
           <div class="record-bay">
             <div class="rec-light">ON AIR</div>
             <div class="speaker-grill" aria-hidden="true"></div>
-            <button class="pixel-btn" id="btn-run" onclick="startPipeline()">生成</button>
+            <button class="pixel-btn" id="btn-run" onclick="startPipeline()">生成播客</button>
           </div>
         </div>
 
@@ -1557,24 +1625,12 @@ button, input { font: inherit; }
       </div>
     </div>
 
-    <aside class="readme-panel" aria-label="当前输出说明">
-      <div class="panel-tab">图录索引</div>
-      <p class="intro-copy">生成时可以看见每一步编目进度。完成后页面会落到一页完整的研究图录，封面、播放器和脚本放在同一个阅读空间里。</p>
-      <div class="coffee-menu">
-        <div class="menu-item">
-          <div class="menu-index">01</div>
-          <div><strong>速览版</strong><span>只生成脚本，更适合先检查论文内容。</span></div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-index">02</div>
-          <div><strong>馆藏版</strong><span>脚本、封面和语音一起生成，更适合发布或试听。</span></div>
-        </div>
-      </div>
-      <div class="status-strip" aria-label="功能状态">
-        <div class="status-chip-item"><span>脚本</span><b>READY</b></div>
-        <div class="status-chip-item"><span>封面</span><b>COMFYUI</b></div>
-        <div class="status-chip-item"><span>音频</span><b>VOICE</b></div>
-      </div>
+    <aside class="info-strip" aria-label="功能说明">
+      <div class="info-strip-item"><strong>速览</strong><span>仅脚本，先看内容</span></div>
+      <div class="info-strip-item"><strong>馆藏</strong><span>脚本 + 封面 + 音频</span></div>
+      <div class="info-strip-status"><span>脚本</span><b>就绪</b></div>
+      <div class="info-strip-status"><span>封面</span><b>可用</b></div>
+      <div class="info-strip-status"><span>音频</span><b>可用</b></div>
       <div class="tape-container" id="tape" aria-hidden="true">
         <div class="tape-reel spin"></div>
         <div class="tape-reel spin"></div>
@@ -1583,52 +1639,47 @@ button, input { font: inherit; }
   </section>
 
   <section id="output-section" aria-label="生成结果">
-    <article class="broadcast-post">
-      <div class="catalog-meta">
-        <span>研究图版 / research plate</span>
-        <span>论文收音机 · 馆藏条目</span>
+
+    <!-- Page 1: full-viewport cover, fixed -->
+    <div class="cover-hero" id="cover-hero">
+      <div id="image-section">
+        <img class="cover-hero-img" id="cover-image" alt="播客封面">
+        <a class="image-download" id="image-download" href="#" download>保存图版</a>
       </div>
-      <header class="broadcast-header">
-        <div>
+      <div class="cover-placeholder" id="cover-placeholder">速览模式不生成封面与音频。切换至馆藏模式，论文将拥有专属的视觉图版与声音注解。</div>
+      <div class="scroll-hint" aria-hidden="true"><span>向下滚动阅读</span><span class="scroll-arrow">↓</span></div>
+    </div>
+
+    <!-- Page 2: slides over the cover -->
+    <article class="broadcast-post">
+
+      <!-- Header with cover image as background -->
+      <header class="broadcast-header" id="broadcast-header">
+        <div class="header-text">
           <p class="broadcast-kicker">研究图录条目 / CATALOGUE ENTRY</p>
           <h1 class="broadcast-title" id="result-title">收听论文</h1>
           <p class="broadcast-subtitle" id="result-subtitle">封面、音频与脚本整理为一页可读可听的学术图录。</p>
-        </div>
-        <div class="blog-actions">
-          <a class="download-link" href="#script-content">阅读脚本</a>
-          <a class="download-link" href="#audio-section">播放音频</a>
+          <div class="blog-actions">
+            <a class="download-link" href="#script-content">阅读脚本</a>
+            <a class="download-link" href="#audio-section">播放音频</a>
+          </div>
         </div>
       </header>
 
-      <div id="warning-section">
-        <div class="warning-card">
-          <div class="warning-label">媒体提示</div>
-          <div id="warning-content"></div>
-        </div>
-      </div>
-
-      <div class="summary-strip">
-        <div class="summary-item"><span>模式</span><b id="summary-mode">FAST</b></div>
-        <div class="summary-item"><span>封面</span><b id="summary-image">等待生成</b></div>
-        <div class="summary-item"><span>音频</span><b id="summary-audio">等待生成</b></div>
+      <div class="post-body">
+      <div id="warning-section" class="warning-inline" style="display:none">
+        <span id="warning-content"></span>
       </div>
 
       <div class="player-layout">
         <aside class="album-side">
-          <div id="image-section">
-            <div class="image-card">
-              <div class="image-label">封面图版</div>
-              <div class="cover-mini-frame">
-                <img class="cover-mini-img" id="cover-image" alt="播客封面">
-              </div>
-              <a class="image-download" id="image-download" href="#" download>保存图版</a>
-            </div>
-          </div>
-          <div class="cover-placeholder" id="cover-placeholder">速览模式不生成封面与音频。切换至馆藏模式，论文将拥有专属的视觉图版与声音注解。</div>
-
           <div class="lcd-player" id="audio-section">
             <div class="audio-card">
               <div class="audio-label">论文收音机 FM</div>
+              <div class="audio-visualizer" id="audio-visualizer" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
               <p class="lcd-title" id="lcd-title">正在收听</p>
               <audio id="audio-player" controls></audio>
               <div class="lcd-bars" aria-hidden="true"></div>
@@ -1637,7 +1688,7 @@ button, input { font: inherit; }
           </div>
           <div class="plate-details" aria-label="图版说明">
             <div class="plate-detail-row"><span>Title</span><b id="plate-title">等待生成</b></div>
-            <div class="plate-detail-row"><span>Mode</span><b id="plate-mode">FAST</b></div>
+            <div class="plate-detail-row"><span>Mode</span><b id="plate-mode">速览</b></div>
             <div class="plate-detail-row"><span>Media</span><b id="plate-media">封面未生成</b></div>
           </div>
         </aside>
@@ -1655,9 +1706,25 @@ button, input { font: inherit; }
         <span>Compiled by PaperCast</span>
         <span>audio / image / transcript</span>
       </footer>
+      </div>
     </article>
   </section>
 </main>
+
+<!-- Sticky audio bar -->
+<div class="sticky-player" id="sticky-player" aria-hidden="true">
+  <button class="sticky-play" id="sticky-play" aria-label="播放/暂停">▶</button>
+  <div class="sticky-cover" id="sticky-cover"></div>
+  <div class="sticky-info">
+    <span class="sticky-title" id="sticky-title">论文收音机 FM</span>
+    <div class="sticky-wave" id="sticky-wave" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+  <span class="sticky-time" id="sticky-time">00:00</span>
+</div>
 
 <div class="confetti-container" id="confetti"></div>
 
@@ -1695,15 +1762,19 @@ function setProgress(pct) {
 }
 
 function showSection(id) {
-  document.getElementById(id).style.display = 'block';
+  const el = document.getElementById(id);
+  if (id === 'output-section') { el.classList.add('revealed'); }
+  else { el.style.display = 'block'; }
 }
-
 function hideSection(id) {
-  document.getElementById(id).style.display = 'none';
+  const el = document.getElementById(id);
+  if (id === 'output-section') { el.classList.remove('revealed'); }
+  else { el.style.display = 'none'; }
 }
 
 function scrollToOutput() {
-  document.getElementById('output-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const post = document.querySelector('.broadcast-post');
+  if (post) post.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function setFormError(message) {
@@ -1711,9 +1782,13 @@ function setFormError(message) {
 }
 
 function extractTitle(text) {
-  const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
-  const candidate = lines.find(line => !/^(主播|旁白|欢迎|大家好|开场|片头|标题[:：]?$)/.test(line)) || lines[0] || '论文播客已生成';
-  return candidate.replace(/^#+\s*/, '').replace(/^标题[:：]\s*/, '').slice(0, 64);
+  // First: try to find the # 播报标题 section and get its content
+  const titleMatch = text.match(/# 播报标题[ \t]*\r?\n+(.+?)(?:\r?\n|$)/);
+  if (titleMatch) return titleMatch[1].trim().replace(/^#+\s*/, '').replace(/\*\*/g, '').slice(0, 80);
+  // Fallback: first non-meta line
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const candidate = lines.find(l => !/^(主播|旁白|欢迎|大家好|开场|片头|标题[:：]?$|好的|没问题)/.test(l)) || lines[0] || '收听论文';
+  return candidate.replace(/^#+\s*/, '').slice(0, 64);
 }
 
 function updateResultText(text) {
@@ -1722,6 +1797,7 @@ function updateResultText(text) {
   document.getElementById('lcd-title').textContent = title.length > 22 ? title.slice(0, 22) + '...' : title;
   document.getElementById('result-subtitle').textContent = '已整理为可读可听的研究图录。先听音频，再看脚本。';
   document.getElementById('plate-title').textContent = title;
+  document.getElementById('sticky-title').textContent = title.length > 22 ? title.slice(0, 22) + '...' : title;
 }
 
 function setPlateDetails({ title, mode, media }) {
@@ -1766,16 +1842,13 @@ function resetResult() {
   document.getElementById('result-title').textContent = '收听论文';
   document.getElementById('result-subtitle').textContent = '封面、音频与脚本整理为一页可读可听的学术图录。';
   document.getElementById('lcd-title').textContent = '正在收听';
-  document.getElementById('summary-mode').textContent = 'FAST';
-  document.getElementById('summary-image').textContent = '等待生成';
-  document.getElementById('summary-audio').textContent = '等待生成';
-  setPlateDetails({ title: '等待生成', mode: 'FAST', media: '封面未生成' });
+  setPlateDetails({ title: '等待生成', mode: '速览', media: '封面未生成' });
   document.getElementById('audio-player').removeAttribute('src');
   const coverImg = document.getElementById('cover-image');
   coverImg.removeAttribute('src');
-  // Clear transcript background cover
-  const ts = document.querySelector('.transcript-side');
-  if (ts) ts.style.removeProperty('--cover-bg');
+  document.querySelectorAll('.transcript-side').forEach(el => {
+    el.style.removeProperty('--cover-bg');
+  });
 }
 
 function startPipeline() {
@@ -1796,13 +1869,23 @@ function startPipeline() {
     return;
   }
 
-  initSteps();
+  initSteps(fastMode);
   setProgress(0);
   showSection('progress-section');
   resetResult();
-  document.getElementById('progress-mode').textContent = fastMode ? 'FAST MODE' : 'FULL MODE';
-  document.getElementById('summary-mode').textContent = fastMode ? 'FAST' : 'FULL';
-  setPlateDetails({ mode: fastMode ? 'FAST' : 'FULL', media: fastMode ? '快速模式不生成封面' : '等待生成图版' });
+  showSection('output-section');
+  document.getElementById('script-content').textContent = '正在生成播客...';
+  document.getElementById('progress-text').textContent = fastMode ? '速览模式' : '馆藏模式';
+  const post = document.querySelector('.broadcast-post');
+  const hero = document.getElementById('cover-hero');
+  if (fastMode) {
+    hero.classList.add('hidden');
+    post.classList.add('no-cover');
+  } else {
+    hero.classList.remove('hidden');
+    post.classList.remove('no-cover');
+  }
+  setPlateDetails({ mode: fastMode ? '速览' : '馆藏', media: fastMode ? '速览模式不生成封面' : '等待生成图版' });
   document.getElementById('tape').classList.add('active');
   document.getElementById('btn-run').disabled = true;
 
@@ -1855,7 +1938,7 @@ function finishWithScript(path) {
   fetch('/api/script?path=' + encodeURIComponent(path))
     .then(r => r.text())
     .then(text => {
-      document.getElementById('script-content').textContent = text;
+      document.getElementById('script-content').innerHTML = formatScriptParagraphs(text);
       updateResultText(text);
       scrollToOutput();
     });
@@ -1895,20 +1978,17 @@ function handleSSE(data) {
         const coverImg = document.getElementById('cover-image');
         coverImg.src = coverUrl;
         setTranscriptCover(coverUrl);
-        document.getElementById('image-download').href = '/api/image?path=' + encodeURIComponent(paths.image);
-        document.getElementById('summary-image').textContent = '已生成';
+        document.getElementById('image-download').href = coverUrl;
         setPlateDetails({ media: 'ComfyUI 生成图版' });
       } else {
-        document.getElementById('summary-image').textContent = '未生成';
         setPlateDetails({ media: '未生成封面图版' });
       }
       if (paths.audio) {
         showSection('audio-section');
         document.getElementById('audio-player').src = '/api/audio?path=' + encodeURIComponent(paths.audio);
+        initAudioPlayer();
+        document.getElementById('audio-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
         document.getElementById('audio-download').href = '/api/audio?path=' + encodeURIComponent(paths.audio);
-        document.getElementById('summary-audio').textContent = '已生成';
-      } else {
-        document.getElementById('summary-audio').textContent = '未生成';
       }
       finishWithScript(paths.script);
     } catch(e) {
@@ -1940,12 +2020,94 @@ document.getElementById('local-pdf').addEventListener('change', function() {
   }
 });
 
-// ── Set cover as faded background of the transcript ──
-function setTranscriptCover(imageUrl) {
-  const side = document.querySelector('.transcript-side');
-  if (side && imageUrl) {
-    side.style.setProperty('--cover-bg', `url("${imageUrl}")`);
+// ── Cover transition: subtle zoom-out as content covers cover ──
+(function() {
+  if ('IntersectionObserver' in window) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        const img = document.getElementById('cover-image');
+        if (img && img.src) {
+          if (e.isIntersecting) { img.classList.remove('transitioning'); }
+          else { img.classList.add('transitioning'); }
+        }
+      });
+    }, { threshold: 0.3 });
+    const hero = document.getElementById('cover-hero');
+    if (hero) obs.observe(hero);
   }
+})();
+
+function setTranscriptCover(imageUrl) {
+  const url = `url("${imageUrl}")`;
+  document.querySelectorAll('.transcript-side').forEach(el => {
+    el.style.setProperty('--cover-bg', url);
+  });
+  const stickyCover = document.getElementById('sticky-cover');
+  if (stickyCover) stickyCover.style.backgroundImage = url;
+}
+
+// ── Sticky audio player (initialized on first audio load) ──
+let _audioInitialized = false;
+function initAudioPlayer() {
+  if (_audioInitialized) return;
+  const audio = document.getElementById('audio-player');
+  if (!audio) return;
+  _audioInitialized = true;
+
+  const sticky = document.getElementById('sticky-player');
+  const stickyPlay = document.getElementById('sticky-play');
+  const stickyTitle = document.getElementById('sticky-title');
+  const stickyTime = document.getElementById('sticky-time');
+  const viz = document.getElementById('audio-visualizer');
+
+  function fmtTime(s) { const m = Math.floor(s / 60); const sec = Math.floor(s % 60); return m + ':' + String(sec).padStart(2, '0'); }
+
+  audio.addEventListener('play', () => {
+    sticky.classList.add('visible');
+    stickyPlay.textContent = '⏸';
+    if (viz) { viz.classList.add('playing'); viz.classList.remove('paused'); }
+  });
+  audio.addEventListener('pause', () => {
+    stickyPlay.textContent = '▶';
+    if (viz) { viz.classList.add('paused'); viz.classList.remove('playing'); }
+  });
+  audio.addEventListener('ended', () => {
+    stickyPlay.textContent = '▶';
+    if (viz) { viz.classList.add('paused'); viz.classList.remove('playing'); }
+  });
+  audio.addEventListener('timeupdate', () => { stickyTime.textContent = fmtTime(audio.currentTime); });
+  audio.addEventListener('loadedmetadata', () => { stickyTime.textContent = fmtTime(0); });
+
+  stickyPlay.addEventListener('click', () => {
+    if (audio.paused) { audio.play(); } else { audio.pause(); }
+  });
+
+  // Sync sticky title from LCD title
+  const lcdTitle = document.getElementById('lcd-title');
+  if (lcdTitle) {
+    new MutationObserver(() => { stickyTitle.textContent = lcdTitle.textContent; }).observe(lcdTitle, { childList: true, characterData: true, subtree: true });
+  }
+}
+
+// ── Spacebar toggles play/pause ──
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && e.target === document.body) {
+    e.preventDefault();
+    const audio = document.getElementById('audio-player');
+    if (audio.src) { audio.paused ? audio.play() : audio.pause(); }
+  }
+});
+
+// ── Auto-format script content into paragraphs ──
+function formatScriptParagraphs(text) {
+  // Remove [uv_break] markers; they're for TTS timing, not visual layout
+  const cleaned = text.replace(/\[uv_break\]/g, '');
+  // Split on 2+ consecutive newlines (real paragraph breaks)
+  const paragraphs = cleaned.split(/\n{2,}/).filter(p => p.trim());
+  // Preserve single newlines within paragraphs as <br> for speech rhythm
+  return paragraphs.map(p =>
+    `<p>${p.trim().split(/\n/).filter(l => l.trim()).join('<br>')}</p>`
+  ).join('\n');
 }
 </script>
 </body>
