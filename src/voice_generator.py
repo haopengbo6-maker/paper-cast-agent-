@@ -12,11 +12,59 @@ from .utils import read_text
 
 
 def build_speech_text(script: str) -> str:
+    """Extract spoken lines from the podcast script, stripping production directions.
+
+    Removes:
+    - Standalone stage directions like (背景音乐淡入) or （轻快音乐）
+    - [uv_break] pause markers (replaced with natural pauses)
+    - Markdown formatting (**bold**, [links](url))
+
+    Preserves:
+    - Inline parenthetical asides like PSNR（你可以理解为画面清晰度）
+    - All dialogue and narration lines
+    """
     text = _extract_script_body(script)
+    # Remove [uv_break] markers → newline for natural pause
     text = text.replace("[uv_break]", "\n")
+    # Strip markdown: **bold** → bold
     text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
+    # Strip markdown: [text](url) → text
     text = re.sub(r"\[(.*?)\]\(.*?\)", r"\1", text)
-    return "\n".join(line.strip() for line in text.splitlines() if line.strip())
+
+    # ── Filter out audio production stage directions ──
+    # These are standalone lines wrapped in parentheses that describe audio
+    # cues, not spoken dialogue. E.g.:
+    #   (轻快的背景音乐淡入，渐弱)
+    #   (背景音乐淡出)
+    #   （节奏加快）
+    # We detect them by: the line is entirely wrapped in parens AND contains
+    # keywords related to audio/music production.
+    _AUDIO_CUE_WORDS = re.compile(
+        r"音乐|淡入|淡出|渐弱|渐强|音效|BGM|背景音乐|节奏|配乐|插入|切歌|音量"
+    )
+
+    cleaned_lines: list[str] = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue  # skip blank lines entirely
+
+        # Check if this whole line is a parenthesized stage direction
+        is_standalone_parens = (
+            (stripped.startswith("(") and stripped.endswith(")"))
+            or (stripped.startswith("（") and stripped.endswith("）"))
+        )
+
+        if is_standalone_parens:
+            # Audio production cue → skip entirely
+            if _AUDIO_CUE_WORDS.search(stripped):
+                continue
+            # Otherwise: standalone spoken aside → strip parens and keep
+            stripped = stripped[1:-1].strip()
+
+        cleaned_lines.append(stripped)
+
+    return "\n".join(cleaned_lines)
 
 
 def generate_voice_audio(

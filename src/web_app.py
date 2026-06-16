@@ -200,6 +200,7 @@ def _run_pipeline(
                 media_config.image,
                 force=force,
                 summary_hint=summary_hint,
+                llm_client=llm_client,
             )
             if image_path:
                 _emit(q, "封面生成", "done", str(image_path), 94)

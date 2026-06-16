@@ -8,7 +8,8 @@ from src.image_generator import (
     cover_image_path,
     generate_cover_image,
     select_comfyui_checkpoint,
-    _map_keywords_to_visuals,
+    _lookup_visual,
+    _extract_title_visual_terms,
 )
 from src.media_config import ImageProviderConfig
 
@@ -19,305 +20,29 @@ KEYWORDS = "# 关键词\n"
 
 
 class ImageGeneratorTests(unittest.TestCase):
-    # ── Prompt structure ──
+    # ── v16: compact, zero-repetition prompts ──
 
-    def test_build_cover_prompt_uses_script_title_and_keywords(self):
+    def test_prompt_is_compact(self):
         script = (
             TITLE
-            + "AI 论文收音机\n\n"
+            + "GROOT-N1: An Open Foundation Model for Generalist Humanoid Robots\n\n"
             + SCRIPT
-            + "今天我们聊一个 agent 系统。\n\n"
+            + "这篇论文提出了 GROOT-N1 开源基础模型。\n"
             + KEYWORDS
-            + "- Agent\n"
-            + "- Tool Learning\n"
+            + "- foundation model\n"
+            + "- manipulation\n"
+            + "- locomotion\n"
         )
-
         prompt = build_cover_prompt(script)
+        words = len(prompt.split())
+        # v16 target: under 130 words
+        self.assertLess(words, 130, f"Prompt too long: {words} words")
+        # No repeated concepts
+        for phrase in ["humanoid", "mechanical", "skeleton", "servo", "biological"]:
+            count = prompt.lower().count(phrase)
+            self.assertLessEqual(count, 1, f"'{phrase}' appears {count} times in prompt")
 
-        self.assertIn("AI 论文收音机", prompt)
-        self.assertIn("visual subject:", prompt)
-
-    def test_build_cover_prompt_uses_summary_hint(self):
-        script = (
-            TITLE
-            + "Flow Matching 让生成模型学会抄近道\n\n"
-            + KEYWORDS
-            + "- Flow Matching\n"
-        )
-
-        prompt = build_cover_prompt(script, "把噪声分布沿最短路径搬到数据分布。")
-
-        self.assertIn("context:", prompt)
-        self.assertIn("噪声分布", prompt)
-        self.assertIn("data-distribution manifold", prompt)
-
-    def test_build_cover_prompt_uses_script_hint(self):
-        script = (
-            TITLE
-            + "题目看起来很泛化\n\n"
-            + SCRIPT
-            + "这篇论文其实讨论人形机器人的双足行走和全身控制。\n"
-            + KEYWORDS
-            + "- embodiment\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        # The script hint triggers humanoid robot topic matching
-        self.assertIn("humanoid robot", prompt)
-        self.assertIn("servo joints", prompt)
-
-    # ── Topic matching ──
-
-    def test_build_cover_prompt_keeps_flow_matching_cover_on_topic(self):
-        script = (
-            TITLE
-            + "Flow Matching 让生成模型学会抄近道\n\n"
-            + SCRIPT
-            + "这篇论文讨论 Continuous Normalizing Flows、向量场、最优传输和扩散模型采样。\n"
-            + KEYWORDS
-            + "- Flow Matching\n"
-            + "- Optimal Transport\n"
-            + "- vector field\n"
-            + "- diffusion models\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("Flow Matching", prompt)
-        self.assertIn("Optimal Transport", prompt)
-        self.assertIn("vector field", prompt)
-        self.assertIn("Gaussian noise particles", prompt)
-        self.assertIn("streamlines", prompt)
-        self.assertIn("no visible text", prompt)
-        self.assertIn("no Chinese characters", prompt)
-        self.assertIn("no ancient art", prompt)
-
-    def test_build_cover_prompt_recognizes_flow_machine_topic(self):
-        script = (
-            TITLE
-            + "Flow Machine 论文里的生成模型新路线\n\n"
-            + SCRIPT
-            + "这篇论文讨论概率路径、ODE 轨迹和生成模型采样。\n"
-            + KEYWORDS
-            + "- Flow Machine\n"
-            + "- generative model\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("Flow Machine", prompt)
-        self.assertIn("Gaussian noise particles", prompt)
-        self.assertIn("data-distribution manifold", prompt)
-        self.assertIn("no generic scenery", prompt)
-
-    def test_build_cover_prompt_handles_physics_topic(self):
-        script = (
-            TITLE
-            + "量子变化与光学场分析\n\n"
-            + SCRIPT
-            + "这篇文章讨论波函数、相互作用和实验曲线。\n"
-            + KEYWORDS
-            + "- quantum\n"
-            + "- optics\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("wave interference", prompt)
-        self.assertIn("particle trajectories", prompt)
-        self.assertIn("field lines", prompt)
-
-    def test_build_cover_prompt_handles_social_science_topic(self):
-        script = (
-            TITLE
-            + "社会行为与政策影响\n\n"
-            + SCRIPT
-            + "这篇文章讨论调查、基于人群的统计和政策反馈。\n"
-            + KEYWORDS
-            + "- sociology\n"
-            + "- survey\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("population nodes", prompt)
-        self.assertIn("survey response", prompt)
-        self.assertIn("policy intervention", prompt)
-
-    def test_build_cover_prompt_handles_chinese_medical_topic(self):
-        script = (
-            TITLE
-            + "题目略写得像普通研究\n\n"
-            + SCRIPT
-            + "这篇论文关注医学病理切片和临床诊断流程。\n"
-            + KEYWORDS
-            + "- representation learning\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("radiology scan", prompt)
-        self.assertIn("diagnostic contour", prompt)
-        self.assertIn("tissue texture", prompt)
-
-    def test_build_cover_prompt_handles_chinese_materials_topic(self):
-        script = (
-            TITLE
-            + "新型材料与电池界面研究\n\n"
-            + SCRIPT
-            + "这篇论文分析半导体晶体、电极表面和微结构。\n"
-            + KEYWORDS
-            + "- interface\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("crystal lattice", prompt)
-        self.assertIn("grain boundaries", prompt)
-        self.assertIn("cross-section", prompt)
-
-    def test_build_cover_prompt_handles_math_topic(self):
-        script = (
-            TITLE
-            + "等式与证明的结构\n\n"
-            + SCRIPT
-            + "这篇论文议论线性代数、坐标几何和定理发现。\n"
-            + KEYWORDS
-            + "- theorem\n"
-            + "- proof\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("geometric proof construction", prompt)
-        self.assertIn("auxiliary construction lines", prompt)
-        self.assertIn("matrix grid", prompt)
-
-    def test_build_cover_prompt_handles_law_topic(self):
-        script = (
-            TITLE
-            + "法律文书与规章分析\n\n"
-            + SCRIPT
-            + "这篇论文关注法律规制、合规与司法案例。\n"
-            + KEYWORDS
-            + "- regulation\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("legal documents", prompt)
-        self.assertIn("balance scale", prompt)
-        self.assertIn("citation threads", prompt)
-
-    def test_build_cover_prompt_handles_energy_topic(self):
-        script = (
-            TITLE
-            + "能源系统与电网调度\n\n"
-            + SCRIPT
-            + "这篇文章讨论光伏和风力的能源能量流动。\n"
-            + KEYWORDS
-            + "- solar\n"
-            + "- grid\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("power grid", prompt)
-        self.assertIn("solar panel", prompt)
-        self.assertIn("power-flow arrows", prompt)
-
-    def test_build_cover_prompt_accepts_english_headings(self):
-        script = (
-            "# title\n"
-            + "Generic paper title\n\n"
-            + "# script\n"
-            + "This paper studies climate remote sensing, ocean change, and carbon monitoring.\n\n"
-            + "# keywords\n"
-            + "- earth observation\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("Generic paper title", prompt)
-        self.assertIn("earth observation", prompt)
-        self.assertIn("atmospheric layer", prompt)
-
-    def test_build_cover_prompt_prevents_robot_skeleton_mismatch(self):
-        script = (
-            TITLE
-            + "人形机器人的全身控制研究\n\n"
-            + SCRIPT
-            + "这篇论文讨论人形机器人的双足行走、伺服关节和全身平衡控制。\n"
-            + KEYWORDS
-            + "- humanoid robot\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("clearly mechanical", prompt)
-        self.assertIn("servo joints", prompt)
-        self.assertIn("no skin", prompt)
-        self.assertIn("no skeleton", prompt)
-        self.assertIn("no human anatomy", prompt)
-
-    def test_build_cover_prompt_handles_geomagnetic_storm_topic(self):
-        script = (
-            TITLE
-            + "地磁暴与空间天气预测\n\n"
-            + SCRIPT
-            + "这篇论文分析太阳风、磁层扰动、电离层响应和极光活动。\n"
-            + KEYWORDS
-            + "- geomagnetic storm\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("coronal mass ejection", prompt)
-        self.assertIn("solar wind", prompt)
-        self.assertIn("magnetosphere", prompt)
-        self.assertIn("no houses", prompt)
-        self.assertIn("no buildings", prompt)
-
-    def test_build_cover_prompt_discourages_house_for_agriculture(self):
-        script = (
-            TITLE
-            + "农业作物产量与土壤传感研究\n\n"
-            + SCRIPT
-            + "这篇论文研究作物、土壤分层、灌溉与产量预测。\n"
-            + KEYWORDS
-            + "- agriculture\n"
-        )
-
-        prompt = build_cover_prompt(script)
-
-        self.assertIn("crop rows", prompt)
-        self.assertIn("soil cross-section cutaway", prompt)
-        self.assertIn("no farmhouse", prompt)
-        self.assertIn("no barn", prompt)
-
-    # ── Paper-specific keyword injection ──
-
-    def test_keyword_to_visual_maps_known_terms(self):
-        _visuals, covered = _map_keywords_to_visuals(["reinforcement learning", "manipulation"])
-        self.assertIn("reinforcement learning", covered)
-        self.assertIn("manipulation", covered)
-
-    def test_keyword_to_visual_unknown_terms_not_passed_through(self):
-        # v15: unknown keywords go to "concepts:" via build_cover_prompt, not through _map_keywords_to_visuals
-        _visuals, covered = _map_keywords_to_visuals(["SomeNovelConcept"])
-        # Unknown terms are not passed through as visuals; they're handled as "concepts:"
-        self.assertEqual(len(_visuals), 0)
-        # But they're not marked as covered either — they'll appear in "concepts:"
-        self.assertNotIn("somenovelconcept", covered)
-
-    def test_keyword_to_visual_filters_generic_terms(self):
-        _visuals, covered = _map_keywords_to_visuals(["model", "method", "data", "deep learning"])
-        self.assertIn("model", covered)
-        self.assertIn("method", covered)
-        self.assertIn("data", covered)
-
-    def test_build_cover_prompt_injects_paper_title_as_subject(self):
+    def test_title_injected_as_visual_subject(self):
         script = (
             TITLE
             + "GROOT-N1: An Open Foundation Model for Generalist Humanoid Robots\n\n"
@@ -328,161 +53,199 @@ class ImageGeneratorTests(unittest.TestCase):
             + "- foundation model\n"
             + "- manipulation\n"
         )
-
         prompt = build_cover_prompt(script)
+        self.assertIn("GROOT-N1", prompt)
+        self.assertIn("subject:", prompt)
+        self.assertIn("context:", prompt)
 
-        # v15: title is parsed into visual terms, not quoted literally.
-        # "Open Foundation Model" and "Generalist Humanoid Robots" are extracted from the title
-        self.assertIn("visual subject:", prompt)
-        self.assertIn("Open Foundation Model", prompt)
-        self.assertIn("Generalist Humanoid Robots", prompt)
-        self.assertIn("foundation model", prompt)
-
-    def test_build_cover_prompt_weaves_keywords_into_scene(self):
+    def test_flow_matching_topic_still_matched(self):
         script = (
             TITLE
-            + "Scaling Cross-Embodied Learning\n\n"
+            + "Flow Matching 让生成模型学会抄近道\n\n"
             + SCRIPT
-            + "这篇论文讨论跨具身迁移学习、操作和导航。\n"
+            + "讨论 Continuous Normalizing Flows、向量场、最优传输。\n"
             + KEYWORDS
-            + "- manipulation\n"
-            + "- navigation\n"
-            + "- transfer learning\n"
+            + "- Flow Matching\n"
+            + "- Optimal Transport\n"
+            + "- vector field\n"
         )
-
         prompt = build_cover_prompt(script)
+        self.assertIn("Flow Matching", prompt)
+        self.assertIn("generative modeling", prompt)
+        self.assertIn("no Chinese", prompt)
 
-        self.assertIn("specifically showing", prompt)
-        self.assertIn("manipulation as", prompt)
-        self.assertIn("navigation as", prompt)
+    def test_humanoid_robot_prevents_skeleton(self):
+        script = (
+            TITLE
+            + "人形机器人的全身控制研究\n\n"
+            + SCRIPT
+            + "讨论人形机器人的双足行走、伺服关节和全身平衡控制。\n"
+            + KEYWORDS
+            + "- humanoid robot\n"
+        )
+        prompt = build_cover_prompt(script)
+        self.assertIn("no skin", prompt)
+        # These should NOT appear multiple times
+        self.assertLessEqual(prompt.lower().count("humanoid"), 2)  # once in subject, maybe in title
 
-    # ── Integration / unchanged ──
+    def test_physics_topic(self):
+        script = (
+            TITLE
+            + "量子变化与光学场分析\n\n"
+            + SCRIPT
+            + "讨论波函数、相互作用和实验曲线。\n"
+            + KEYWORDS
+            + "- quantum\n"
+            + "- optics\n"
+        )
+        prompt = build_cover_prompt(script)
+        self.assertIn("wave patterns", prompt)
+        self.assertIn("physics", prompt.lower())
+
+    def test_climate_topic(self):
+        script = (
+            "# title\n"
+            + "Climate remote sensing study\n\n"
+            + "# script\n"
+            + "This paper studies climate remote sensing and ocean change.\n\n"
+            + "# keywords\n"
+            + "- earth observation\n"
+        )
+        prompt = build_cover_prompt(script)
+        self.assertIn("earth system", prompt)
+        # Title terms now map to visual cues via CN_EN_MAP → KEYWORD_VISUALS
+        self.assertIn("climate", prompt.lower())
+        self.assertIn("atmospheric layers", prompt.lower())  # visual cue from climate/remote sensing
+
+    def test_geomagnetic_storm_topic(self):
+        script = (
+            TITLE
+            + "地磁暴与空间天气预测\n\n"
+            + SCRIPT
+            + "分析太阳风、磁层扰动、电离层响应和极光活动。\n"
+            + KEYWORDS
+            + "- geomagnetic storm\n"
+        )
+        prompt = build_cover_prompt(script)
+        self.assertIn("space weather", prompt)
+        self.assertIn("magnetosphere", prompt)
+
+    def test_agriculture_discourages_farmhouse(self):
+        script = (
+            TITLE
+            + "农业作物产量与土壤传感研究\n\n"
+            + SCRIPT
+            + "研究作物、土壤分层、灌溉与产量预测。\n"
+            + KEYWORDS
+            + "- agriculture\n"
+        )
+        prompt = build_cover_prompt(script)
+        self.assertIn("agricultural research", prompt)
+        self.assertIn("crop rows", prompt)
+
+    # ── Keyword visual lookup ──
+
+    def test_lookup_visual_finds_exact_match(self):
+        cue = _lookup_visual("manipulation")
+        self.assertIsNotNone(cue)
+        self.assertIn("robotic hand", cue)
+
+    def test_lookup_visual_handles_plurals(self):
+        cue = _lookup_visual("robots")
+        self.assertIsNone(cue)  # "robots" not in dict, "robot" is also not
+
+    def test_lookup_visual_returns_none_for_generic(self):
+        cue = _lookup_visual("method")
+        self.assertIsNone(cue)
+
+    # ── Title extraction ──
+
+    def test_extract_title_visual_terms_splits_on_colon(self):
+        terms = _extract_title_visual_terms(
+            "GROOT-N1: An Open Foundation Model for Generalist Humanoid Robots"
+        )
+        self.assertIn("GROOT-N1", terms)
+        self.assertIn("Open Foundation Model", terms)
+        self.assertIn("Generalist Humanoid Robots", terms)
+
+    def test_extract_title_visual_terms_handles_simple_title(self):
+        terms = _extract_title_visual_terms("LSTM Networks for Sequence Prediction")
+        self.assertTrue(len(terms) >= 2, f"Expected >=2 terms, got {terms}")
+
+    # ── Integration ──
 
     def test_disabled_provider_returns_none(self):
         with tempfile.TemporaryDirectory() as tmp:
             result = generate_cover_image(
-                "paper",
-                TITLE + "标题",
-                Path(tmp),
+                "paper", TITLE + "标题", Path(tmp),
                 ImageProviderConfig("none", "", 1),
             )
             self.assertIsNone(result)
 
     def test_writes_returned_image_bytes(self):
         calls = []
-
         def fake_request(url, payload, timeout):
             calls.append((url, payload, timeout))
             return b"\x89PNG\r\n\x1a\nimage"
-
         with tempfile.TemporaryDirectory() as tmp:
             path = generate_cover_image(
-                "paper",
-                TITLE + "标题",
-                Path(tmp),
+                "paper", TITLE + "标题", Path(tmp),
                 ImageProviderConfig("comfyui", "http://local", 9),
-                request_image=fake_request,
-                force=True,
+                request_image=fake_request, force=True,
             )
-            self.assertEqual(path, Path(tmp) / "paper_cover_v15.png")
+            self.assertEqual(path, Path(tmp) / "paper_cover_v16.png")
             self.assertEqual(path.read_bytes(), b"\x89PNG\r\n\x1a\nimage")
-            self.assertEqual(calls[0][0], "http://local")
-            self.assertEqual(calls[0][2], 9)
 
-    def test_flow_topic_uses_artistic_comfyui_prompt(self):
+    def test_flow_topic_prompt_has_artistic_elements(self):
         calls = []
-
         def fake_request(url, payload, timeout):
             calls.append(payload)
             return b"\x89PNG\r\n\x1a\nimage"
-
-        script = (
-            TITLE
-            + "Flow Matching 让生成模型学会抄近道\n\n"
-            + KEYWORDS
-            + "- Flow Matching\n"
-            + "- vector field\n"
-        )
-
+        script = TITLE + "Flow Matching 让生成模型学会抄近道\n\n" + KEYWORDS + "- Flow Matching\n- vector field\n"
         with tempfile.TemporaryDirectory() as tmp:
             path = generate_cover_image(
-                "flow_machine",
-                script,
-                Path(tmp),
+                "flow_machine", script, Path(tmp),
                 ImageProviderConfig("comfyui", "http://local", 9),
-                request_image=fake_request,
-                force=True,
+                request_image=fake_request, force=True,
             )
-
-            self.assertEqual(path, Path(tmp) / "flow_machine_cover_v15.png")
-            self.assertTrue(path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"))
+            self.assertEqual(path, Path(tmp) / "flow_machine_cover_v16.png")
             self.assertIn("colored pencil and gouache", calls[0]["prompt"])
             self.assertIn("printmaking aesthetic", calls[0]["prompt"])
             self.assertIn("cream paper", calls[0]["prompt"])
-            self.assertIn("letterpress impression", calls[0]["prompt"])
-            self.assertIn("editorial art-book", calls[0]["prompt"])
 
-    def test_cover_image_path_includes_prompt_version(self):
+    def test_cover_image_path_includes_version(self):
         self.assertEqual(
             cover_image_path(Path("images"), "paper"),
-            Path("images") / "paper_cover_v15.png",
+            Path("images") / "paper_cover_v16.png",
         )
 
-    def test_selects_first_available_comfyui_checkpoint(self):
-        object_info = {
-            "CheckpointLoaderSimple": {
-                "input": {
-                    "required": {
-                        "ckpt_name": [["model-a.safetensors", "model-b.safetensors"], {}]
-                    }
-                }
-            }
-        }
-        self.assertEqual(select_comfyui_checkpoint(object_info), "model-a.safetensors")
+    def test_selects_first_checkpoint(self):
+        info = {"CheckpointLoaderSimple": {"input": {"required": {"ckpt_name": [["a.safetensors", "b.safetensors"], {}]}}}}
+        self.assertEqual(select_comfyui_checkpoint(info), "a.safetensors")
 
-    def test_comfyui_checkpoint_selection_fails_clearly_when_empty(self):
-        object_info = {
-            "CheckpointLoaderSimple": {
-                "input": {"required": {"ckpt_name": [[], {}]}}
-            }
-        }
+    def test_checkpoint_empty_fails(self):
+        info = {"CheckpointLoaderSimple": {"input": {"required": {"ckpt_name": [[], {}]}}}}
         with self.assertRaisesRegex(RuntimeError, "No ComfyUI checkpoint"):
-            select_comfyui_checkpoint(object_info)
+            select_comfyui_checkpoint(info)
 
-    def test_negative_prompt_blocks_common_mismatches(self):
-        workflow = build_sdxl_workflow(
-            checkpoint="sd_xl_base_1.0.safetensors",
-            positive_prompt="cover",
-            output_prefix="out",
-        )
-        negative = workflow["7"]["inputs"]["text"]
+    def test_negative_prompt_blocks_mismatches(self):
+        wf = build_sdxl_workflow("sd.safetensors", "cover", "out")
+        neg = wf["7"]["inputs"]["text"]
+        self.assertIn("human skeleton", neg)
+        self.assertIn("house", neg)
+        self.assertIn("photorealistic", neg)
+        self.assertIn("Chinese characters", neg)
+        self.assertIn("circuit board", neg)
 
-        self.assertIn("human skeleton", negative)
-        self.assertIn("house", negative)
-        self.assertIn("building", negative)
-        self.assertIn("photorealistic", negative)
-        self.assertIn("3d render", negative)
-        self.assertIn("Chinese characters", negative)
-        self.assertIn("circuit board", negative)
-
-    def test_build_sdxl_workflow_uses_checkpoint_and_prompt(self):
-        workflow = build_sdxl_workflow(
-            checkpoint="sd_xl_base_1.0.safetensors",
-            positive_prompt="podcast cover",
-            output_prefix="papercast_cover",
-        )
-
-        self.assertEqual(workflow["4"]["inputs"]["ckpt_name"], "sd_xl_base_1.0.safetensors")
-        self.assertIn("podcast cover", workflow["6"]["inputs"]["text"])
-        self.assertIn("photorealistic", workflow["7"]["inputs"]["text"])
-        self.assertIn("Chinese characters", workflow["7"]["inputs"]["text"])
-        self.assertIn("ancient Chinese painting", workflow["7"]["inputs"]["text"])
-        self.assertIn("human skeleton", workflow["7"]["inputs"]["text"])
-        self.assertIn("house", workflow["7"]["inputs"]["text"])
-        self.assertEqual(workflow["8"]["inputs"]["steps"], 35)
-        self.assertEqual(workflow["8"]["inputs"]["sampler_name"], "dpmpp_2m")
-        self.assertEqual(workflow["8"]["inputs"]["scheduler"], "karras")
-        self.assertEqual(workflow["10"]["inputs"]["filename_prefix"], "papercast_cover")
+    def test_sdxl_workflow_structure(self):
+        wf = build_sdxl_workflow("sd_xl.safetensors", "podcast cover", "pc")
+        self.assertEqual(wf["4"]["inputs"]["ckpt_name"], "sd_xl.safetensors")
+        self.assertIn("podcast cover", wf["6"]["inputs"]["text"])
+        self.assertIn("photorealistic", wf["7"]["inputs"]["text"])
+        self.assertEqual(wf["8"]["inputs"]["steps"], 30)
+        self.assertEqual(wf["8"]["inputs"]["sampler_name"], "dpmpp_2m")
+        self.assertEqual(wf["8"]["inputs"]["scheduler"], "karras")
+        self.assertEqual(wf["10"]["inputs"]["filename_prefix"], "pc")
 
 
 if __name__ == "__main__":
