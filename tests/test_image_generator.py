@@ -19,7 +19,7 @@ KEYWORDS = "# 关键词\n"
 
 
 class ImageGeneratorTests(unittest.TestCase):
-    # ── Prompt structure tests ──
+    # ── Prompt structure ──
 
     def test_build_cover_prompt_uses_script_title_and_keywords(self):
         script = (
@@ -35,8 +35,7 @@ class ImageGeneratorTests(unittest.TestCase):
         prompt = build_cover_prompt(script)
 
         self.assertIn("AI 论文收音机", prompt)
-        self.assertIn("Agent", prompt)
-        self.assertIn("scientific plate illustration", prompt)
+        self.assertIn("visual subject:", prompt)
 
     def test_build_cover_prompt_uses_summary_hint(self):
         script = (
@@ -48,7 +47,7 @@ class ImageGeneratorTests(unittest.TestCase):
 
         prompt = build_cover_prompt(script, "把噪声分布沿最短路径搬到数据分布。")
 
-        self.assertIn("research context", prompt)
+        self.assertIn("context:", prompt)
         self.assertIn("噪声分布", prompt)
         self.assertIn("data-distribution manifold", prompt)
 
@@ -64,12 +63,11 @@ class ImageGeneratorTests(unittest.TestCase):
 
         prompt = build_cover_prompt(script)
 
-        # The script hint triggers topic matching — the scene should reflect humanoid robot concepts
+        # The script hint triggers humanoid robot topic matching
         self.assertIn("humanoid robot", prompt)
-        self.assertIn("servo motors", prompt)
-        self.assertIn("embodiment", prompt)
+        self.assertIn("servo joints", prompt)
 
-    # ── Topic matching tests ──
+    # ── Topic matching ──
 
     def test_build_cover_prompt_keeps_flow_matching_cover_on_topic(self):
         script = (
@@ -90,7 +88,7 @@ class ImageGeneratorTests(unittest.TestCase):
         self.assertIn("Optimal Transport", prompt)
         self.assertIn("vector field", prompt)
         self.assertIn("Gaussian noise particles", prompt)
-        self.assertIn("vector-field streamlines", prompt)
+        self.assertIn("streamlines", prompt)
         self.assertIn("no visible text", prompt)
         self.assertIn("no Chinese characters", prompt)
         self.assertIn("no ancient art", prompt)
@@ -226,8 +224,8 @@ class ImageGeneratorTests(unittest.TestCase):
         prompt = build_cover_prompt(script)
 
         self.assertIn("power grid", prompt)
+        self.assertIn("solar panel", prompt)
         self.assertIn("power-flow arrows", prompt)
-        self.assertIn("energy storage", prompt)
 
     def test_build_cover_prompt_accepts_english_headings(self):
         script = (
@@ -258,7 +256,7 @@ class ImageGeneratorTests(unittest.TestCase):
         prompt = build_cover_prompt(script)
 
         self.assertIn("clearly mechanical", prompt)
-        self.assertIn("servo motors", prompt)
+        self.assertIn("servo joints", prompt)
         self.assertIn("no skin", prompt)
         self.assertIn("no skeleton", prompt)
         self.assertIn("no human anatomy", prompt)
@@ -298,27 +296,26 @@ class ImageGeneratorTests(unittest.TestCase):
         self.assertIn("no farmhouse", prompt)
         self.assertIn("no barn", prompt)
 
-    # ── Paper-specific keyword-to-visual injection tests ──
+    # ── Paper-specific keyword injection ──
 
     def test_keyword_to_visual_maps_known_terms(self):
-        visuals = _map_keywords_to_visuals(["reinforcement learning", "manipulation", "locomotion"])
-        self.assertTrue(any("reinforcement learning" in v for v in visuals),
-                        f"Expected 'reinforcement learning' in visuals: {visuals}")
-        self.assertTrue(any("manipulation" in v for v in visuals),
-                        f"Expected 'manipulation' in visuals: {visuals}")
+        _visuals, covered = _map_keywords_to_visuals(["reinforcement learning", "manipulation"])
+        self.assertIn("reinforcement learning", covered)
+        self.assertIn("manipulation", covered)
 
-    def test_keyword_to_visual_handles_unknown_terms(self):
-        visuals = _map_keywords_to_visuals(["SomeNovelConcept"])
-        self.assertTrue(any("SomeNovelConcept" in v for v in visuals),
-                        f"Expected unknown term passed through: {visuals}")
+    def test_keyword_to_visual_unknown_terms_not_passed_through(self):
+        # v15: unknown keywords go to "concepts:" via build_cover_prompt, not through _map_keywords_to_visuals
+        _visuals, covered = _map_keywords_to_visuals(["SomeNovelConcept"])
+        # Unknown terms are not passed through as visuals; they're handled as "concepts:"
+        self.assertEqual(len(_visuals), 0)
+        # But they're not marked as covered either — they'll appear in "concepts:"
+        self.assertNotIn("somenovelconcept", covered)
 
     def test_keyword_to_visual_filters_generic_terms(self):
-        visuals = _map_keywords_to_visuals(["model", "method", "data", "deep learning"])
-        # Generic terms should be filtered out
-        self.assertFalse(any("model" == v for v in visuals),
-                         f"Generic 'model' should be filtered: {visuals}")
-        self.assertFalse(any("method" == v for v in visuals),
-                         f"Generic 'method' should be filtered: {visuals}")
+        _visuals, covered = _map_keywords_to_visuals(["model", "method", "data", "deep learning"])
+        self.assertIn("model", covered)
+        self.assertIn("method", covered)
+        self.assertIn("data", covered)
 
     def test_build_cover_prompt_injects_paper_title_as_subject(self):
         script = (
@@ -334,11 +331,11 @@ class ImageGeneratorTests(unittest.TestCase):
 
         prompt = build_cover_prompt(script)
 
-        # Title is the visual subject
-        self.assertIn("GROOT-N1", prompt)
-        self.assertIn("illustrating this specific research", prompt)
-        # Keywords are woven in as visual elements
-        self.assertIn("key concepts are visualized", prompt)
+        # v15: title is parsed into visual terms, not quoted literally.
+        # "Open Foundation Model" and "Generalist Humanoid Robots" are extracted from the title
+        self.assertIn("visual subject:", prompt)
+        self.assertIn("Open Foundation Model", prompt)
+        self.assertIn("Generalist Humanoid Robots", prompt)
         self.assertIn("foundation model", prompt)
 
     def test_build_cover_prompt_weaves_keywords_into_scene(self):
@@ -355,13 +352,11 @@ class ImageGeneratorTests(unittest.TestCase):
 
         prompt = build_cover_prompt(script)
 
-        # Keywords should appear as visual elements, not just in context brackets
-        self.assertIn("key concepts are visualized", prompt)
-        # At least one keyword should appear with "shown as"
-        self.assertIn("manipulation", prompt)
-        self.assertIn("navigation", prompt)
+        self.assertIn("specifically showing", prompt)
+        self.assertIn("manipulation as", prompt)
+        self.assertIn("navigation as", prompt)
 
-    # ── Integration / unchanged tests ──
+    # ── Integration / unchanged ──
 
     def test_disabled_provider_returns_none(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -389,7 +384,7 @@ class ImageGeneratorTests(unittest.TestCase):
                 request_image=fake_request,
                 force=True,
             )
-            self.assertEqual(path, Path(tmp) / "paper_cover_v13.png")
+            self.assertEqual(path, Path(tmp) / "paper_cover_v15.png")
             self.assertEqual(path.read_bytes(), b"\x89PNG\r\n\x1a\nimage")
             self.assertEqual(calls[0][0], "http://local")
             self.assertEqual(calls[0][2], 9)
@@ -419,18 +414,18 @@ class ImageGeneratorTests(unittest.TestCase):
                 force=True,
             )
 
-            self.assertEqual(path, Path(tmp) / "flow_machine_cover_v13.png")
+            self.assertEqual(path, Path(tmp) / "flow_machine_cover_v15.png")
             self.assertTrue(path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"))
             self.assertIn("colored pencil and gouache", calls[0]["prompt"])
             self.assertIn("printmaking aesthetic", calls[0]["prompt"])
-            self.assertIn("archival paper", calls[0]["prompt"])
+            self.assertIn("cream paper", calls[0]["prompt"])
             self.assertIn("letterpress impression", calls[0]["prompt"])
-            self.assertIn("editorial art-book composition", calls[0]["prompt"])
+            self.assertIn("editorial art-book", calls[0]["prompt"])
 
     def test_cover_image_path_includes_prompt_version(self):
         self.assertEqual(
             cover_image_path(Path("images"), "paper"),
-            Path("images") / "paper_cover_v13.png",
+            Path("images") / "paper_cover_v15.png",
         )
 
     def test_selects_first_available_comfyui_checkpoint(self):

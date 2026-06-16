@@ -14,21 +14,19 @@ from .media_config import ImageProviderConfig
 from .utils import read_text
 
 
-COVER_PROMPT_VERSION = "v13"
+COVER_PROMPT_VERSION = "v15"
 
 _TITLE_HEADINGS = ("# 播报标题", "# 标题", "# title")
 _SCRIPT_HEADINGS = ("# 播报脚本", "# 脚本", "# script")
 _KEYWORD_HEADINGS = ("# 关键词", "# 关键字", "# keywords")
 
-# ── Artistic style (front-loaded — SDXL weights first tokens most heavily) ──
+# ── Artistic style — compact, front-loaded for SDXL ──
 _STYLE = (
-    "archival scientific plate illustration, "
-    "colored pencil and gouache on cream-toned archival paper, "
-    "printmaking aesthetic with subtle plate-mark registration lines, "
-    "letterpress impression texture, editorial art-book composition, "
-    "muted scholarly palette: burnt sienna, ochre, indigo ink, olive green accents, "
-    "soft paper grain, generous negative space around the subject, "
-    "elegant diagrammatic quality, hand-rendered precision"
+    "archival scientific plate, colored pencil and gouache on cream paper, "
+    "printmaking aesthetic with plate-mark registration lines, "
+    "letterpress impression, editorial art-book layout, "
+    "palette: burnt sienna, ochre, indigo ink, olive green, "
+    "soft paper grain, generous negative space"
 )
 
 # ── Global constraints ──
@@ -41,276 +39,423 @@ _CONSTRAINTS = (
 
 
 # ═══════════════════════════════════════════════════════════════════
-#  Keyword → visual element mapping
+#  Keyword → visual element mapping (~150 entries)
 #  Converts abstract academic terms into concrete, paintable visuals.
-#  Each entry maps a lowercase keyword/phrase to a short visual cue.
 # ═══════════════════════════════════════════════════════════════════
 
 _KEYWORD_VISUALS: dict[str, str] = {
-    # ── AI / ML general ──
-    "foundation model": "a unifying architectural backbone connecting diverse capability modules",
-    "generalist": "multiple task domains arranged as linked but distinct visual panels",
-    "multi-task": "parallel task lanes with shared backbone feeding into specialized heads",
-    "transfer learning": "knowledge flowing from a source domain to a target domain as a bridge",
-    "few-shot": "a model making correct predictions from only a handful of labeled examples",
-    "zero-shot": "a model recognizing an object category it has never seen during training",
-    "fine-tuning": "a pre-existing neural structure being refined by a stream of new data points",
-    "pre-training": "a vast corpus of data being absorbed into a growing neural representation",
-    "scaling law": "a log-log plot showing performance rising with compute and model size",
-    "emergent ability": "a sudden capability appearing beyond a critical scale threshold",
-    "in-context learning": "a few demonstration examples changing model behavior without weight updates",
-    "chain-of-thought": "step-by-step reasoning nodes connected by logical inference arrows",
-    "instruction tuning": "natural language commands being mapped to structured model responses",
-    "alignment": "model outputs being steered toward human-preferred regions of a value space",
-    "rlhf": "reinforcement learning from human feedback shown as a reward signal loop",
-    "benchmark": "comparative bar charts across multiple methods with one bar highlighted",
-    "ablation": "component removal study shown as importance-ranked bars with drops marked",
-    "latent space": "a low-dimensional manifold with clustered point clouds in distinct colors",
-    "embedding": "high-dimensional vectors projected into visible 2D space as scattered stars",
-    "attention": "highlighted connection bands between related token pairs",
-    "self-attention": "a sequence attending to itself with weighted connection density",
-    "cross-attention": "two sequences aligned by bridging attention weights",
-    "transformer": "stacked layers with multi-head attention and feed-forward blocks",
-    "tokenizer": "raw text being split into discrete colored token blocks",
-    "mixture of experts": "a router directing inputs to specialized expert sub-networks",
-    "moe": "a router directing inputs to specialized expert sub-networks",
+    # ── Robot embodiments ──
+    "humanoid robot": "a clearly mechanical humanoid figure with metal composite shell panels, servo joints, sensor head, and cable hints — not biological, no skin, no skeleton",
+    "humanoid": "a clearly mechanical humanoid figure with metal composite shell panels, servo joints, and sensor head — not biological, no skin, no skeleton",
+    "bipedal robot": "a two-legged robot mid-stride with leg joint trajectories and footstep pressure maps",
+    "quadruped robot": "a four-legged robot with articulated leg joints and terrain contact sensors",
+    "robot arm": "a multi-axis industrial robot arm with joint angle arcs and end-effector pose markers",
+    "mobile robot": "a wheeled or tracked robot platform with sensor array and navigation path overlay",
+    "drone": "a multi-rotor aerial vehicle with flight path trajectory and onboard camera payload",
+    "soft robot": "a compliant flexible-bodied robot with pneumatic or tendon-driven actuation channels",
+    "bimanual": "two robotic arms coordinating together to manipulate a shared object",
+    "aloha": "two dexterous robotic arms performing fine-grained bimanual tasks over a tabletop workspace",
+    "cross-embodied": "multiple different robot forms sharing a common learned policy across distinct embodiments",
+    "aviation": "an aerial vehicle or drone in flight with trajectory path and onboard perception sensors",
+    "quadrotor": "a four-rotor aerial vehicle with flight dynamics and onboard camera payload",
+
+    # ── AI / ML core ──
+    "foundation model": "a unifying architectural backbone feeding into diverse downstream capability modules arranged radially",
+    "generalist": "multiple distinct task domains arranged as linked visual panels sharing a common backbone",
+    "multi-task": "parallel task-specific heads branching from a shared neural trunk",
+    "transfer learning": "knowledge flowing as a colored bridge from source domain on left to target domain on right",
+    "few-shot": "a model making correct predictions from only a handful of labeled support examples",
+    "zero-shot": "a model recognizing an unseen category represented only by a semantic description",
+    "fine-tuning": "a pre-existing neural structure being refined by an incoming stream of new data points",
+    "pre-training": "a vast corpus of varied data being absorbed into a growing neural representation",
+    "scaling law": "a log-log plot showing performance rising predictably with compute and model size axes",
+    "emergent ability": "a sudden capability spike appearing beyond a critical scale threshold line",
+    "in-context learning": "a few demonstration exemplars in a prompt reshaping model behavior without weight updates",
+    "chain-of-thought": "step-by-step reasoning nodes connected by logical deduction arrows toward a conclusion",
+    "instruction tuning": "natural language commands being mapped to structured task-completion outputs",
+    "alignment": "model outputs being steered toward human-preferred regions in a value space diagram",
+    "rlhf": "a reward signal loop from human preference judgments back into policy optimization",
+    "benchmark": "comparative bar chart across methods with one bar prominently highlighted as best",
+    "ablation": "component removal study shown as a descending importance-ranked bar chart",
+    "latent space": "a low-dimensional manifold projection with distinct colored point-cloud clusters",
+    "embedding": "high-dimensional vectors projected into visible 2D space as scattered constellation points",
+    "attention": "weighted connection bands between query and key positions, brighter for stronger links",
+    "self-attention": "a sequence attending to its own elements with weighted connection density patterns",
+    "cross-attention": "two sequences of different lengths aligned by bridging attention weight bands",
+    "transformer": "stacked layers with multi-head attention and feed-forward blocks in alternation",
+    "token": "discrete text units rendered as small colored squares flowing through processing layers",
+    "tokenizer": "raw text fragmenting into discrete colored token blocks along a segmentation boundary",
+    "mixture of experts": "a router dispersing incoming tokens across specialized expert sub-networks in parallel",
+    "moe": "a router dispersing tokens across specialized expert sub-networks in parallel",
 
     # ── Generative models ──
-    "diffusion model": "noise gradually resolving into a clean structured image through denoising steps",
-    "denoising": "a noisy image becoming progressively cleaner across horizontal stages",
-    "score-based": "gradient fields pointing toward higher data density regions",
-    "generative adversarial": "a generator and discriminator locked in a minimax game as two opposing forces",
-    "gan": "a generator and discriminator as two opposing forces in equilibrium",
-    "vae": "an encoder compressing data into a latent distribution and a decoder reconstructing it",
-    "variational autoencoder": "an encoder mapping to a probability distribution, decoder sampling from it",
-    "autoregressive": "tokens generated one-by-one in left-to-right sequential order",
-    "discrete token": "continuous data being quantized into a codebook of discrete visual tokens",
+    "diffusion model": "noise gradually resolving into a clean structured image across horizontal denoising stages",
+    "diffusion": "noise gradually resolving into a clean structured image across horizontal denoising stages",
+    "denoising": "a noisy image becoming progressively cleaner and sharper across a sequence of steps",
+    "score-based": "gradient vector fields pointing from noisy regions toward higher data-density regions",
+    "gan": "a generator and discriminator shown as two opposing forces reaching equilibrium",
+    "generative adversarial": "a generator and discriminator locked in a minimax game as opposing diagrams",
+    "vae": "an encoder compressing to a latent bottleneck distribution and a decoder reconstructing the output",
+    "variational autoencoder": "an encoder mapping to a gaussian latent distribution, decoder sampling and reconstructing",
+    "autoregressive": "tokens predicted one-by-one in left-to-right sequential order with probability bars",
+    "discrete token": "continuous data being vector-quantized into a codebook of discrete visual tokens",
 
     # ── Computer Vision ──
-    "object detection": "bounding boxes with confidence scores localizing objects in a scene",
-    "segmentation": "pixel-precise boundary contours partitioning an image into semantic regions",
-    "instance segmentation": "each individual object instance outlined in a distinct color mask",
-    "semantic segmentation": "every pixel assigned a category label shown as a color-coded map",
-    "panoptic segmentation": "both semantic regions and individual instances shown in unified overlay",
-    "pose estimation": "skeleton keypoints connected by bones overlaid on a moving figure",
-    "depth estimation": "a scene rendered with distance-based shading from near to far",
-    "optical flow": "motion vectors as small arrows showing pixel movement between frames",
-    "3d reconstruction": "a 2D image projecting outward into a volumetric 3D form",
-    "nerf": "rays passing through a volumetric radiance field with density sampling points",
-    "gaussian splatting": "ellipsoid gaussians scattered in 3D space rendering a scene",
-    "visual grounding": "language phrases linked by arrows to specific image regions",
-    "image captioning": "an image on the left connected to descriptive output tokens on the right",
-    "super-resolution": "a low-resolution patch enlarged into a high-resolution detailed version",
-    "image inpainting": "a masked region being filled in with context-consistent content",
-    "image generation": "a new image materializing from a text description or noise seed",
+    "object detection": "bounding boxes with confidence scores localizing objects across a scene image",
+    "segmentation": "pixel-precise boundary contours partitioning an image into semantically labeled regions",
+    "instance segmentation": "each individual object instance outlined in a distinct color mask overlay",
+    "semantic segmentation": "every pixel assigned a category label rendered as a color-coded segmentation map",
+    "panoptic segmentation": "semantic regions and individual instances unified in a single overlay visualization",
+    "pose estimation": "skeleton keypoints connected by bone links overlaid on a moving human or animal figure",
+    "depth estimation": "a scene rendered with warm-to-cool distance-based shading from near foreground to far background",
+    "optical flow": "dense motion vector arrows showing pixel displacement direction and magnitude between frames",
+    "3d reconstruction": "multiple 2D views projecting into a unified volumetric 3D form with surface mesh",
+    "nerf": "rays passing through a volumetric radiance field with density sampling points along each ray",
+    "gaussian splatting": "ellipsoid 3D gaussians scattered in space collectively rendering a coherent scene",
+    "visual grounding": "language phrase arrows pointing to the corresponding highlighted image regions",
+    "image captioning": "an input image on the left connected by generation arrows to descriptive output tokens on the right",
+    "super-resolution": "a low-resolution pixelated patch enlarged side-by-side into a high-resolution detailed version",
+    "image inpainting": "a masked erased region being seamlessly filled with context-consistent content",
+    "image generation": "a new image materializing from a text prompt or noise seed through iterative refinement",
 
-    # ── Robotics / Embodied AI ──
-    "manipulation": "a robotic hand precisely grasping an object with force-feedback markers",
-    "locomotion": "bipedal walking trajectory with footstep pressure distribution maps",
-    "navigation": "path-planning topology with obstacle avoidance force fields",
-    "grasping": "fingertip contact points on an object surface with grasp quality metrics",
-    "dexterous": "multi-finger hand with independent joint articulations manipulating a small object",
-    "teleoperation": "a human operator motion on the left mirrored by a robot on the right",
-    "sim-to-real": "a simulation domain on the left transferring policies to a real robot on the right",
-    "domain randomization": "diverse training environments with varying textures lighting and physics",
-    "motion planning": "a collision-free path winding through obstacle-filled configuration space",
-    "kinematics": "joint angle arcs and end-effector reachable workspace boundaries",
-    "dynamics": "force and torque vectors acting on a rigid body with acceleration traces",
-    "whole-body control": "coordinated joint torques distributed across the entire robot body",
+    # ── Robotics skills ──
+    "manipulation": "a robotic hand or gripper precisely grasping an object with fingertip force-feedback markers",
+    "locomotion": "bipedal walking trajectory with footstep pressure distribution maps on the ground plane",
+    "navigation": "path-planning topology with optimal route highlighted and obstacle avoidance force fields",
+    "grasping": "fingertip contact points distributed on an object surface with grasp quality score indicators",
+    "dexterous": "a multi-finger robotic hand with independent joint articulations manipulating a small object",
+    "teleoperation": "a human operator motion capture on the left mirrored by a robot executing the same motion on the right",
+    "sim-to-real": "a simulation domain on the left transferring learned policies across a domain gap to a real robot on the right",
+    "domain randomization": "diverse training environments with varying textures, lighting conditions, and physics parameters",
+    "motion planning": "a collision-free trajectory winding through a configuration space filled with obstacle regions",
+    "kinematics": "joint angle arcs and end-effector reachable workspace envelope boundaries",
+    "dynamics": "force and torque vectors acting on rigid body segments with acceleration motion trails",
+    "whole-body control": "coordinated joint torque commands distributed across the entire robot body from a central controller",
 
     # ── Medical ──
-    "tumor": "a highlighted irregular mass with spiculated boundary in tissue cross-section",
-    "lesion": "an abnormal tissue region marked by a diagnostic contour overlay",
-    "mri": "a grayscale brain or body cross-section slice with anatomical annotation marks",
-    "ct scan": "sequential axial slice views stacked into a volumetric perspective",
-    "x-ray": "a radiographic projection with bones and soft tissue in inverse contrast",
-    "ultrasound": "a sonographic image with speckle texture and measurement calipers",
-    "pathology": "a stained tissue slide at cellular magnification with region annotations",
-    "histology": "tissue microstructure with cell nuclei visible as small stained dots",
-    "endoscopy": "an interior tubular organ view with a highlighted polyp or anomaly",
-    "diagnosis": "a diagnostic decision tree branching from symptoms to possible conditions",
-    "prognosis": "a time-series projection of disease trajectory with confidence bands",
-    "survival analysis": "a Kaplan-Meier curve showing survival probability over time",
+    "tumor": "an irregular mass with spiculated boundary highlighted in a tissue cross-section",
+    "lesion": "an abnormal tissue region marked by a colored diagnostic contour overlay",
+    "mri": "a grayscale brain or body cross-section slice with anatomical region annotation markers",
+    "ct scan": "sequential axial slice views stacked into a volumetric perspective projection",
+    "x-ray": "a radiographic projection with bones and soft tissue shown in inverse grayscale contrast",
+    "ultrasound": "a sonographic image with characteristic speckle texture and measurement caliper marks",
+    "pathology": "a stained tissue slide at cellular magnification with region-of-interest annotations",
+    "histology": "tissue microstructure with cell nuclei visible as small stained dots in a regular arrangement",
+    "endoscopy": "an interior tubular organ view with a highlighted polyp or lesion anomaly",
+    "diagnosis": "a diagnostic decision tree branching from observed symptoms to ranked possible conditions",
+    "prognosis": "a time-series disease trajectory projection with confidence interval bands",
+    "survival analysis": "a Kaplan-Meier curve showing survival probability declining over follow-up time",
 
     # ── Biology / Life Sciences ──
-    "protein structure": "a folded polypeptide chain as a 3D ribbon diagram with alpha helices and beta sheets",
-    "protein folding": "an unfolded chain progressively collapsing into a compact folded state",
-    "dna": "a double helix with complementary base pairs connected by hydrogen bond rungs",
-    "rna": "a single-stranded polynucleotide chain folding into secondary structure loops",
-    "gene expression": "a heatmap grid of activation levels across multiple conditions and genes",
-    "mutation": "a highlighted base-pair substitution in a DNA sequence alignment",
-    "cell signaling": "ligand-receptor binding at the membrane triggering a cascade of kinase arrows",
-    "metabolic pathway": "a network of enzymatic reaction nodes with substrate-to-product arrows",
-    "microbiome": "diverse bacterial colony shapes clustered in a host-environment interface",
-    "crispr": "a Cas9 protein with guide RNA targeting a specific genomic locus for editing",
-    "single-cell": "individual cells plotted as points in a 2D gene-expression embedding space",
+    "protein structure": "a folded polypeptide chain as a 3D ribbon diagram with alpha helices and beta sheet arrows",
+    "protein folding": "an unfolded chain progressively collapsing through intermediates into a compact native state",
+    "dna": "a double helix with complementary base-pair rungs connecting the two sugar-phosphate backbones",
+    "rna": "a single-stranded polynucleotide chain folding back on itself into secondary structure stem-loops",
+    "gene expression": "a heatmap grid of activation levels across multiple conditions and gene rows",
+    "mutation": "a highlighted base-pair substitution site in a DNA sequence alignment view",
+    "cell signaling": "ligand-receptor binding at the cell membrane triggering a cascade of intracellular kinase arrows",
+    "metabolic pathway": "a network of enzymatic reaction nodes connected by substrate-to-product conversion arrows",
+    "microbiome": "diverse bacterial colony shapes clustered in a host-environment interface zone",
+    "crispr": "a Cas9 protein with guide RNA directing a cut at a specific genomic target locus",
+    "single-cell": "individual cells plotted as points in a 2D reduced-dimension gene-expression embedding space",
 
     # ── Physics ──
-    "quantum": "wavefunction probability density clouds around an atomic nucleus",
-    "entanglement": "two particles connected by a correlated-state line spanning space",
-    "superposition": "a single system existing in multiple basis states shown as overlapping ghost images",
-    "superconductivity": "electrical resistance dropping abruptly to zero at a critical temperature",
-    "phase transition": "a system transforming from one phase to another at a critical threshold",
-    "condensed matter": "atoms arranged in a periodic lattice with electron band structure overlay",
-    "particle physics": "subatomic particle tracks in a detector with curvature from magnetic field",
+    "quantum": "wavefunction probability density clouds surrounding an atomic nucleus center",
+    "entanglement": "two particles connected by a glowing correlated-state correlation line across space",
+    "superposition": "a single system existing in multiple basis states shown as overlapping semi-transparent ghost images",
+    "superconductivity": "electrical resistance dropping abruptly to zero at a marked critical temperature point",
+    "phase transition": "a system transforming from one ordered phase to another at a sharp critical threshold",
+    "condensed matter": "atoms in periodic lattice arrangement with electron band structure energy overlay",
+    "particle physics": "subatomic particle tracks curving through a detector under magnetic field influence",
 
     # ── Materials Science ──
-    "crystal structure": "atoms arranged in periodic 3D lattice with unit cell boundaries marked",
-    "defect": "an irregularity or vacancy highlighted in an otherwise regular crystal lattice",
-    "interface": "a boundary layer where two materials meet with atomic interaction zone",
-    "microstructure": "polycrystalline grain boundaries with different orientation shading",
-    "nanoparticle": "a tiny faceted particle with surface ligand molecules attached",
+    "crystal structure": "atoms arranged in a periodic 3D lattice with unit cell boundary box marked",
+    "defect": "an irregularity or atomic vacancy highlighted within an otherwise regular crystal lattice",
+    "interface": "an atomic boundary layer where two different materials meet with an interaction transition zone",
+    "microstructure": "polycrystalline grain boundaries with different crystallographic orientation shading per grain",
+    "nanoparticle": "a tiny faceted particle with surface ligand molecules attached like a molecular corona",
 
     # ── Chemistry ──
-    "catalyst": "a surface with active sites where reactant molecules dock and transform",
-    "reaction mechanism": "step-by-step electron-pushing arrows showing bond-making and bond-breaking",
-    "molecular dynamics": "a molecule with motion trails showing vibrational and rotational modes",
-    "spectroscopy": "an absorption or emission spectrum with characteristic peak pattern",
+    "catalyst": "a solid surface with highlighted active sites where reactant molecules dock and transform",
+    "reaction mechanism": "step-by-step electron-pushing curved arrows showing bond-making and bond-breaking",
+    "molecular dynamics": "a molecule with motion trail ghosts showing vibrational and rotational movement modes",
+    "spectroscopy": "an absorption or emission spectrum trace with characteristic peak pattern and baseline",
 
     # ── Energy ──
-    "solar cell": "a photovoltaic panel cross-section with photon-to-electron conversion diagram",
-    "battery": "layered anode-electrolyte-cathode with lithium-ion flow arrows between electrodes",
-    "fuel cell": "hydrogen and oxygen inputs with proton-exchange membrane and water output",
-    "wind turbine": "three aerodynamic blades with wake flow patterns and generator cutaway",
+    "solar cell": "a photovoltaic panel in cross-section showing photon absorption and electron-hole pair generation",
+    "battery": "layered anode-electrolyte-cathode structure with lithium-ion migration arrows between electrodes",
+    "fuel cell": "hydrogen input and oxygen input combining through a membrane to produce water and electrical output",
+    "wind turbine": "three aerodynamic blades with wake flow streamlines and generator nacelle cutaway view",
 
     # ── Systems / Networks ──
-    "distributed system": "multiple computing nodes with message-passing arrows and consensus markers",
-    "load balancing": "incoming requests being distributed across server nodes by a dispatcher",
-    "caching": "a fast small memory layer intercepting requests before reaching slow storage",
-    "database": "a cylinder abstraction with indexed retrieval paths and query execution plan",
+    "distributed system": "multiple computing nodes connected by message-passing arrows with consensus protocol markers",
+    "load balancing": "incoming request stream being distributed evenly across a pool of server nodes by a dispatcher",
+    "caching": "a fast small memory layer intercepting requests before they reach the slower large storage tier below",
+    "database": "a storage cylinder abstraction with index lookup paths and a query execution plan tree",
 
     # ── Control / RL ──
-    "reinforcement learning": "reward signal flowing through a decision network, value function as a heatmap",
-    "policy gradient": "a policy surface with gradient arrows pointing toward higher-reward regions",
-    "exploration": "branching trajectories exploring unknown regions before converging to optimal path",
-    "regret": "a gap closing between optimal and achieved performance over time steps",
+    "reinforcement learning": "a reward signal flowing through a decision network, value function rendered as a heatmap overlay",
+    "policy gradient": "a policy parameter surface with gradient arrows converging uphill toward higher-reward regions",
+    "exploration": "branching search trajectories spreading into unknown regions before converging to an optimal path",
+    "regret": "a gap gradually closing between optimal and achieved cumulative performance over time steps",
 
     # ── Math ──
-    "optimization": "a loss surface with gradient descent path spiraling into a minimum basin",
-    "convergence": "iterates approaching a fixed point with decreasing step sizes visible",
-    "manifold": "a curved lower-dimensional surface embedded in higher-dimensional space",
-    "topology": "shapes being continuously deformed while preserving connectedness properties",
-    "graph": "nodes and edges with degree distribution and community structure visible",
+    "optimization": "a loss surface landscape with a gradient descent path spiraling into a deep minimum basin",
+    "convergence": "iterates approaching a fixed point with visibly decreasing step sizes between successive positions",
+    "manifold": "a curved lower-dimensional surface smoothly embedded within a higher-dimensional ambient space",
+    "topology": "shapes being continuously deformed while preserving their essential connectedness properties",
+    "graph": "nodes connected by edges with visible community structure and degree distribution patterns",
 
     # ── Generic research concepts ──
-    "dataset": "data samples arranged in a structured grid showing diversity and distribution",
-    "efficiency": "a gauge or ratio indicator showing performance relative to resource usage",
-    "trade-off": "a Pareto frontier curve showing the optimal balance between two competing objectives",
-    "robustness": "a system maintaining performance under various perturbation types and magnitudes",
-    "generalization": "training distribution on the left and a different test distribution on the right",
-    "uncertainty": "predictions shown with confidence intervals or error bars of varying widths",
-    "interpretability": "a black-box model being opened to reveal its internal decision logic",
-    "distillation": "a large teacher model transferring knowledge to a smaller student model",
-    "pruning": "a dense network with inactive connections being removed leaving a sparse substructure",
-    "quantization": "continuous weight values being discretized into a reduced set of precision levels",
-    "federated learning": "multiple local data silos contributing model updates to a central aggregator",
-    "contrastive learning": "positive pairs pulled together and negative pairs pushed apart in embedding space",
-    "self-supervised": "a model learning representations from unlabeled data by predicting masked parts",
-    "data augmentation": "a single sample transformed into multiple variants through rotations crops and noise",
-    "adversarial": "a clean input and its imperceptibly perturbed version producing different outputs",
-    "out-of-distribution": "in-distribution samples clustered tightly with OOD samples falling outside",
-    "active learning": "a model querying an oracle for labels on the most uncertain or diverse samples",
-    "meta-learning": "a meta-learner extracting common patterns across multiple learning episodes",
-    "continual learning": "a model sequentially acquiring new skills while retaining old ones without forgetting",
-    "causality": "a directed acyclic graph with causal arrows showing cause-effect relationships",
-    "attention mechanism": "query-key-value dot-product with softmax weights highlighting relevant positions",
-    "normalization": "data being centered and scaled to zero mean and unit variance distributions",
-    "regularization": "model complexity being constrained by a penalty term shrinking weight magnitudes",
-    "ensemble": "multiple diverse models voting or averaging to produce a combined prediction",
-    "knowledge graph": "entities as nodes connected by typed relation edges forming a semantic web",
-    "retrieval-augmented": "a query fetching relevant documents from an external knowledge base before generation",
-    "rag": "a retriever fetching documents and a generator incorporating them into the output",
-    "vector database": "high-dimensional vectors indexed in a searchable space with nearest-neighbor lookup",
-    "token": "discrete text units shown as small colored squares flowing through processing layers",
-    "open-source": "code and model weights released publicly as an open resource for the community",
+    "dataset": "data samples arranged in a structured grid showing diversity across classes and feature distributions",
+    "efficiency": "a gauge showing performance relative to resource consumption with a highlighted sweet spot",
+    "trade-off": "a Pareto frontier curve revealing the optimal balance between two competing objective axes",
+    "robustness": "a system maintaining stable performance under various perturbation types and increasing magnitudes",
+    "generalization": "training data distribution on the left and a distinctly shifted test distribution on the right",
+    "uncertainty": "predictions displayed with confidence intervals or error bars showing varying certainty widths",
+    "interpretability": "a black-box model being opened with a cutaway view to reveal its internal decision structure",
+    "distillation": "a large complex teacher model transferring condensed knowledge to a compact student model",
+    "pruning": "a dense network with inactive low-weight connections being removed, leaving a sparse efficient substructure",
+    "quantization": "continuous weight values being discretized into a reduced set of discrete precision levels",
+    "federated learning": "multiple isolated local data silos each contributing model updates to a central aggregation server",
+    "contrastive learning": "positive paired samples pulled together and negative paired samples pushed apart in embedding space",
+    "self-supervised": "a model learning rich representations from unlabeled data by predicting deliberately masked portions",
+    "data augmentation": "a single sample transformed into multiple variants through rotations, crops, flips, and color jitter",
+    "adversarial": "a clean input and its imperceptibly perturbed adversarial version producing dramatically different outputs",
+    "out-of-distribution": "in-distribution samples clustered tightly with out-of-distribution samples falling clearly outside",
+    "active learning": "a model selectively querying an oracle for labels on the most uncertain or informative unlabeled samples",
+    "meta-learning": "a meta-learner extracting common learning patterns aggregated across multiple distinct training episodes",
+    "continual learning": "a model sequentially acquiring new task skills while retaining previously learned ones without catastrophic forgetting",
+    "causality": "a directed acyclic graph with causal arrow edges showing genuine cause-to-effect relationships",
+    "attention mechanism": "query-key-value dot-product computation with softmax-normalized attention weight distribution",
+    "normalization": "data being centered and scaled to zero mean and unit variance, shown as a distribution shift operation",
+    "regularization": "model complexity constrained by a penalty term visualized as shrinking weight magnitude toward zero",
+    "ensemble": "multiple diverse base models voting or averaging their outputs to produce a combined final prediction",
+    "knowledge graph": "entities as labeled nodes connected by typed semantic relation edges forming an interlinked web",
+    "retrieval-augmented": "a query first fetching relevant documents from an external knowledge store before response generation",
+    "rag": "a two-stage system: a retriever fetching documents from a knowledge base, then a generator incorporating them",
+    "vector database": "high-dimensional embedding vectors indexed and searchable in a nearest-neighbor lookup space",
+    "open-source": "code and model weights symbolically released as an open public resource with community contributions",
+    "training-free": "a model achieving results without any additional training or fine-tuning steps",
+    "lighting control": "directional light sources casting controlled illumination with shadow manipulation on a scene",
+    "policy": "a decision boundary or control surface mapping observations to optimal actions",
+    "sequence prediction": "a temporal sequence with past observations on the left and future predictions extending to the right",
+    "time series": "a temporal signal waveform with past and future segments separated by a prediction horizon marker",
 }
 
 
 def build_cover_prompt(script: str, summary_hint: str = "") -> str:
-    """Build a paper-specific SDXL prompt: style → title as subject → discipline stage → keyword props → constraints.
+    """Build a paper-specific SDXL prompt.
 
-    The key insight: the paper's specific title and keywords drive the visual content,
-    while the discipline-matched scene provides the stage and visual vocabulary.
+    Architecture: style → title-visual-core → discipline-stage → keyword-props → summary → constraints.
+    Title terms are extracted and front-loaded for maximum SDXL weight.
     """
     title = _section_first_line(script, *_TITLE_HEADINGS) or "academic research paper"
     raw_keywords = _section_lines(script, _KEYWORD_HEADINGS, limit=8)
     keywords_clean = [line.lstrip("- ").strip() for line in raw_keywords]
     summary_line = _first_meaningful_line(summary_hint)
     script_line = _extract_script_hint(script)
-
     keyword_text = ", ".join(keywords_clean)
 
-    # Match discipline to get the base scene (stage + visual vocabulary)
+    # ── Extract visual terms from the TITLE (highest priority) ──
+    title_terms = _extract_title_visual_terms(title)
+    # Map title terms to visuals
+    title_visuals, title_covered = _map_keywords_to_visuals(title_terms)
+    # Also extract any raw title terms that didn't map (for direct visual cue)
+    raw_title_terms = [t for t in title_terms if t.lower() not in title_covered and t.lower() not in _GENERIC_WORDS]
+
+    # ── Match discipline → base stage scene ──
     base_scene = _infer_topic_visual_scene(title, keyword_text, summary_line, script_line)
 
-    # Map the paper's specific keywords to concrete visual elements
-    keyword_visuals = _map_keywords_to_visuals(keywords_clean)
+    # ── Map keyword terms to visuals ──
+    keyword_visuals, kw_covered = _map_keywords_to_visuals(keywords_clean)
 
-    # Compose: the title IS the subject, keywords drive the visual details
-    subject_clause = f'illustrating this specific research: "{title}"'
-    scene_clause = f"scene — {base_scene}"
+    # ── Merge visuals: title visuals first (higher priority), then keyword visuals ──
+    all_visuals: list[str] = []
+    seen: set[str] = set()
+    for v in title_visuals:
+        if v not in seen:
+            all_visuals.append(v)
+            seen.add(v)
+    for v in keyword_visuals:
+        if v not in seen:
+            all_visuals.append(v)
+            seen.add(v)
 
-    detail_clauses: list[str] = []
-    if keyword_visuals:
-        # Weave keyword visuals into the scene description
-        visual_str = "; ".join(keyword_visuals[:5])
-        detail_clauses.append(f"this paper's key concepts are visualized: {visual_str}")
-        # Remaining keywords as conceptual anchors
-        remaining = [kw for kw in keywords_clean if kw.lower() not in _KEYWORD_VISUALS
-                     and not any(v.lower().startswith(kw.lower()) for k in _KEYWORD_VISUALS for v in [k])]
-        # Actually let's just use all keywords that weren't mapped as direct visual cues
-        mapped_lower = {k.lower() for k in _KEYWORD_VISUALS}
-        unmapped = [kw for kw in keywords_clean if kw.lower() not in mapped_lower]
-        if unmapped:
-            detail_clauses.append(f"additional concepts: {', '.join(unmapped[:4])}")
-    elif keywords_clean:
-        detail_clauses.append(f"concepts: {', '.join(keywords_clean[:5])}")
+    # ── Compose prompt ──
+    parts: list[str] = []
 
+    # Layer 1: Style
+    parts.append(_STYLE)
+
+    # Layer 2: Title-derived visual core — HIGHEST weight, front-loaded
+    title_parts: list[str] = []
+    title_parts.extend(title_visuals[:4])
+    # Raw unmapped terms from title also carry unique visual signal
+    title_parts.extend(raw_title_terms[:2])
+    if title_parts:
+        core = "; ".join(title_parts)
+        parts.append(f"visual subject: {core}")
+
+    # Layer 3: Discipline stage + all visuals woven together
+    if all_visuals:
+        props = "; ".join(all_visuals[:6])
+        parts.append(f"scene: {base_scene} — specifically showing {props}")
+    else:
+        parts.append(f"scene: {base_scene}")
+
+    # Layer 4: Unmapped keywords as conceptual anchors
+    all_covered = title_covered | kw_covered
+    unmapped = [kw for kw in keywords_clean
+                if kw.lower() not in all_covered
+                and len(kw) >= 3
+                and kw.lower() not in _GENERIC_WORDS]
+    if unmapped:
+        parts.append(f"concepts: {', '.join(unmapped[:4])}")
+
+    # Layer 5: Summary context
     if summary_line:
-        detail_clauses.append(f"research context: {summary_line[:150]}")
+        parts.append(f"context: {summary_line[:140]}")
 
-    details = ". ".join(detail_clauses)
+    # Layer 6: Constraints
+    parts.append(_CONSTRAINTS)
 
-    return (
-        f"{_STYLE}. "
-        f"{subject_clause}. "
-        f"{scene_clause}. "
-        f"{details}. "
-        f"{_CONSTRAINTS}"
-    )
+    return ". ".join(parts)
 
 
-def _map_keywords_to_visuals(keywords: list[str]) -> list[str]:
-    """Map paper keywords to concrete visual elements using the keyword-visual dictionary.
+# Words too generic to provide visual signal — filtered from prompts
+_GENERIC_WORDS = {
+    "paper", "method", "result", "study", "research", "analysis", "approach",
+    "model", "system", "data", "learning", "training", "test", "performance",
+    "experiment", "evaluation", "implementation", "proposed", "novel", "improved",
+    "基于", "方法", "研究", "实验", "结果", "分析", "模型", "系统", "数据",
+}
 
-    Returns a list of strings like "keyword shown as visual_description".
+# Words to strip from titles — they carry no visual information
+_TITLE_STOP_WORDS = {
+    "a", "an", "the", "is", "are", "was", "were", "be", "been", "being",
+    "have", "has", "had", "do", "does", "did", "will", "would", "could", "should",
+    "may", "might", "can", "shall", "to", "of", "in", "for", "on", "with",
+    "at", "by", "from", "as", "into", "through", "during", "before", "after",
+    "above", "below", "between", "under", "over", "out", "off", "up", "down",
+    "about", "than", "then", "also", "very", "just", "only", "such", "no", "not",
+    "or", "and", "but", "if", "because", "so", "yet", "while", "although",
+    "its", "it", "this", "that", "these", "those", "we", "our", "you", "your",
+    "towards", "toward", "via", "using", "based", "new", "one",
+    "learning", "scaling", "low", "cost", "high", "quality",
+    "improved", "efficient", "scalable", "robust", "towards",
+    "review", "survey", "comprehensive", "study", "approach", "method",
+    "analysis", "evaluation", "comparison", "case", "overview",
+}
+
+# Prepositions & connectors that join two separate concepts — split on these
+_TITLE_SPLIT_WORDS = {"for", "with", "via", "using", "from", "through", "based", "towards", "toward"}
+
+
+def _extract_title_visual_terms(title: str) -> list[str]:
+    """Extract meaningful visual noun phrases from a paper title.
+
+    Splits on colon, comma, 'and', 'or', and prepositions ('for', 'with', 'via'...),
+    then extracts multi-word phrases that carry visual meaning.
+
+    Examples:
+        "GROOT-N1: An Open Foundation Model for Generalist Humanoid Robots"
+        → ["GROOT-N1", "Open Foundation Model", "Generalist Humanoid Robots"]
+
+        "Scaling Cross-Embodied Learning: One Policy for Manipulation, Navigation,
+         Locomotion, and Aviation"
+        → ["Cross-Embodied Learning", "Manipulation", "Navigation",
+            "Locomotion", "Aviation"]
+
+        "Mobile ALOHA: Learning Bimanual Mobile Manipulation with
+         Low-Cost Whole-Body Teleoperation"
+        → ["Mobile ALOHA", "Bimanual Mobile Manipulation",
+            "Whole-Body Teleoperation"]
+    """
+    # Step 1: Split on major delimiters (colon, semicolon, em-dash)
+    segments = re.split(r"[:;]|\s+[–—]\s+", title)
+
+    # Step 2: Within each segment, split on commas, 'and', 'or', and prepositions
+    split_pattern = r",\s*|\s+(?:and|or|" + "|".join(re.escape(w) for w in _TITLE_SPLIT_WORDS) + r")\s+"
+    all_phrases: list[str] = []
+    for segment in segments:
+        sub_segments = re.split(split_pattern, segment.strip(), flags=re.IGNORECASE)
+        for sub in sub_segments:
+            words = sub.strip().split()
+            # Remove stop words
+            content_words = [w for w in words
+                           if w.lower() not in _TITLE_STOP_WORDS
+                           and len(w) >= 2]
+            if not content_words:
+                continue
+            phrase = " ".join(content_words).rstrip(".,;:!?()[]{}")
+            # Keep phrases with ≥2 content words or a single significant word (acronym, proper noun)
+            if len(content_words) >= 2:
+                if phrase and len(phrase) >= 3:
+                    all_phrases.append(phrase)
+            elif len(content_words) == 1:
+                word = content_words[0]
+                # Single word: keep if it looks significant (acronym, compound, or ≥4 chars)
+                if word.isupper() or "-" in word or len(word) >= 4:
+                    if word.lower() not in _GENERIC_WORDS:
+                        all_phrases.append(word)
+
+    # Deduplicate, preserving order
+    seen: set[str] = set()
+    unique: list[str] = []
+    for phrase in all_phrases:
+        lower = phrase.lower()
+        if lower not in seen:
+            unique.append(phrase)
+            seen.add(lower)
+
+    return unique
+
+
+def _map_keywords_to_visuals(keywords: list[str]) -> tuple[list[str], set[str]]:
+    """Map paper keywords to concrete visual elements.
+
+    Returns (visual_strings, covered_keyword_lowercase_set).
     """
     results: list[str] = []
-    seen_visuals: set[str] = set()  # deduplicate similar visuals
+    covered: set[str] = set()
+    seen_visuals: set[str] = set()
+
     for kw in keywords:
-        kw_lower = kw.lower().rstrip("s")  # normalize plurals
-        # Try exact match first, then without trailing 's', then substring match
-        visual = (
-            _KEYWORD_VISUALS.get(kw_lower)
-            or _KEYWORD_VISUALS.get(kw.lower())
-            or _KEYWORD_VISUALS.get(kw_lower.rstrip("s"))
-        )
-        if not visual:
-            # Fuzzy: check if any dict key is a substring of the keyword or vice versa
-            for dict_key, dict_visual in _KEYWORD_VISUALS.items():
-                if len(dict_key) >= 4 and (dict_key in kw_lower or kw_lower in dict_key):
-                    visual = dict_visual
-                    break
-        if visual and visual not in seen_visuals:
-            results.append(f"{kw} shown as {visual}")
-            seen_visuals.add(visual)
-        elif not visual:
-            # Include the keyword directly — SDXL can interpret many terms natively
-            if len(kw) >= 3 and kw.lower() not in {"paper", "method", "result", "study", "research",
-                                                     "analysis", "approach", "model", "system", "data",
-                                                     "learning", "training", "test", "performance"}:
-                results.append(kw)
-    return results
+        kw_lower = kw.lower()
+        if kw_lower in _GENERIC_WORDS or len(kw) < 3:
+            covered.add(kw_lower)
+            continue
+
+        visual = _lookup_visual(kw_lower)
+        if visual:
+            if visual not in seen_visuals:
+                results.append(f"{kw} as {visual}")
+                seen_visuals.add(visual)
+            covered.add(kw_lower)
+        # If no mapping found: don't pass through as bare keyword —
+        # unmapped keywords are handled separately as "concepts:"
+        # This prevents "humanoid robot" appearing twice (once bare, once in concepts)
+
+    return results, covered
+
+
+def _lookup_visual(kw_lower: str) -> str | None:
+    """Look up a keyword in the visual mapping dict with fuzzy matching."""
+    # Exact match
+    if kw_lower in _KEYWORD_VISUALS:
+        return _KEYWORD_VISUALS[kw_lower]
+    # Singular/plural variants
+    if kw_lower.rstrip("s") in _KEYWORD_VISUALS:
+        return _KEYWORD_VISUALS[kw_lower.rstrip("s")]
+    if kw_lower + "s" in _KEYWORD_VISUALS:
+        return _KEYWORD_VISUALS[kw_lower + "s"]
+    # Substring: key is substring of kw or vice versa (min 4 chars to avoid false matches)
+    for dict_key, dict_visual in _KEYWORD_VISUALS.items():
+        if len(dict_key) >= 4:
+            if dict_key in kw_lower or kw_lower in dict_key:
+                return dict_visual
+    return None
 
 
 def generate_cover_image(
@@ -548,16 +693,15 @@ def _section_first_line(text: str, *headings: str) -> str:
 
 
 # ═══════════════════════════════════════════════════════════════════
-#  Topic → visual scene mapping (discipline stage)
-#  Each entry provides the STAGE and visual VOCABULARY for a discipline.
-#  Paper-specific details (title, keywords) are layered on top by
-#  build_cover_prompt().
+#  Discipline stage descriptions
+#  Each provides the STAGE and visual VOCABULARY. Kept compact —
+#  the paper's own keywords supply the specific props on this stage.
 # ═══════════════════════════════════════════════════════════════════
 
 def _infer_topic_visual_scene(
     title: str, keywords: str, summary_hint: str = "", script_hint: str = ""
 ) -> str:
-    """Return the base visual scene for the paper's discipline."""
+    """Return a compact discipline-stage scene description."""
     text = f"{title} {keywords} {summary_hint} {script_hint}".lower()
 
     # ── Flow Matching / Generative Models ──
@@ -570,9 +714,9 @@ def _infer_topic_visual_scene(
         ),
     ):
         return (
-            "left: Gaussian noise particles dissolving into smooth vector-field streamlines, "
-            "right: trajectories converging into a data-distribution manifold, "
-            "ODE trajectory lines connecting the two realms, coordinate grid and contour lines tracing the learned mapping"
+            "Gaussian noise particles on the left dissolving into smooth vector-field streamlines "
+            "that curve across the composition and converge into a data-distribution manifold on "
+            "the right, with ODE trajectory lines and a coordinate grid tracing the learned mapping"
         )
 
     topic_blocks: list[tuple[tuple[str, ...], str]] = [
@@ -587,10 +731,10 @@ def _infer_topic_visual_scene(
             ),
             (
                 "a clearly mechanical humanoid robot as the central figure on a laboratory "
-                "motion-capture floor, metal composite shell panels with visible panel gaps, "
-                "servo motors at joints, sensor head unit, motion trajectory arcs traced behind "
-                "limbs, balance force-vector arrows rising from center of mass, engineering grid "
-                "floor; mechanical not biological — no skin, no skeleton, no human anatomy"
+                "motion-capture floor with engineering grid, metal composite shell panels, "
+                "servo joints with motion trajectory arcs, force-vector arrows from center of "
+                "mass, sensor head unit with camera apertures; mechanical not biological — "
+                "no skin, no skeleton, no human anatomy"
             ),
         ),
         # ── Computer Vision ──
@@ -599,13 +743,14 @@ def _infer_topic_visual_scene(
                 "vision transformer", "计算机视觉", "目标检测", "图像分割", "姿态估计",
                 "image recognition", "object detection", "segmentation",
                 "pose estimation", "visual grounding", "multimodal",
-                "image synthesis", "generative vision", "diffusion",
+                "image synthesis", "image generation", "generative vision",
+                "lighting control", "image editing",
             ),
             (
-                "a photograph in the center being analytically deconstructed: patch-grid overlay, "
-                "bounding box around a focal object, segmentation mask contours, attention heatmap "
-                "glowing over salient regions, feature activation trails radiating outward to "
-                "filter-response thumbnails in the margin"
+                "a single photograph in the center being analytically deconstructed: patch-grid "
+                "overlay, bounding box around a focal object, segmentation mask contours in "
+                "contrasting color, attention heatmap glowing over salient regions, feature "
+                "activation trails radiating to filter-response thumbnails in the margin"
             ),
         ),
         # ── LLM / Language Models ──
@@ -613,14 +758,14 @@ def _infer_topic_visual_scene(
             (
                 "llm", "大语言模型", "语言模型", "提示词", "对齐",
                 "large language model", "language model", "instruction tuning",
-                "alignment", "transformer", "token", "reasoning", "prompt", "rlhf",
+                "alignment", "transformer", "reasoning", "prompt", "rlhf",
             ),
             (
-                "stacked transformer layers as horizontal attention bands, token tiles flowing "
-                "through them, embedding vectors scattered as a starfield in low-dimensional "
-                "projection, prompt block on the left connected by a widening river of meaning "
-                "to a response block on the right; no robot face, no chat app, no magic book, "
-                "no glowing brain"
+                "stacked transformer layers as horizontal attention bands with token tiles "
+                "flowing through them, embedding vectors scattered as a constellation in "
+                "low-dimensional projection, a prompt block on the left connected by a widening "
+                "river of meaning to a response block on the right; no robot face, no chat app "
+                "screenshot, no glowing brain, no magic book"
             ),
         ),
         # ── Medical / Clinical ──
@@ -632,10 +777,11 @@ def _infer_topic_visual_scene(
                 "biomedical", "bioimaging", "bioinformatics", "genomics", "proteomics",
             ),
             (
-                "a radiology scan or pathology slide as the central panel, diagnostic contour "
-                "overlays in colored pencil, measurement calipers marking distances, tissue "
-                "texture detail at one edge, clinical chart traces and lab markers as marginal "
-                "annotations; no hospital room, no doctor portrait, no stethoscope"
+                "a radiology scan or pathology slide as the central vertical panel with "
+                "diagnostic contour overlays in colored pencil, measurement calipers marking "
+                "anatomical distances, tissue texture detail at one edge, clinical chart traces "
+                "and lab value markers as marginal annotations; no hospital room, no doctor "
+                "portrait, no stethoscope, no pill bottles"
             ),
         ),
         # ── Physics ──
@@ -647,11 +793,11 @@ def _infer_topic_visual_scene(
                 "astronomy", "astrophysics",
             ),
             (
-                "wave interference as the main motif — concentric ripples from two sources "
-                "crossing into a standing pattern, particle trajectories as dashed arrow lines, "
-                "field lines as continuous flowing curves, abstract equation fragments as "
-                "unreadable symbolic marks, coordinate axes; no fantasy space art, no planets "
-                "as decoration, no landscape"
+                "wave interference as the main visual motif — concentric ripples from two "
+                "sources crossing into a standing pattern, particle trajectories as dashed "
+                "arrow lines curving through a field, field lines as flowing curves, abstract "
+                "equation fragments as unreadable symbolic marks, coordinate axes; no fantasy "
+                "space art, no decorative planets, no landscape"
             ),
         ),
         # ── Materials Science ──
@@ -663,9 +809,9 @@ def _infer_topic_visual_scene(
             ),
             (
                 "crystal lattice as an isometric 3D construction of spheres connected by rods "
-                "in repeating unit cells, a cross-section slice at the bottom revealing grain "
-                "boundaries as irregular polygons, electron-microscope texture at one corner, "
-                "electrode or catalyst interface as a horizontal boundary with reaction arrows; "
+                "in repeating unit cells, a cross-section slice at the bottom revealing internal "
+                "grain boundaries as irregular polygons, electron-microscope texture inset at "
+                "one corner, electrode or catalyst interface as a horizontal reaction boundary; "
                 "no buildings, no furniture, no circuit board wallpaper"
             ),
         ),
@@ -679,9 +825,9 @@ def _infer_topic_visual_scene(
             (
                 "a single cell as the central subject — rounded form with visible nucleus and "
                 "organelle silhouettes in muted colors, molecular pathway arrows connecting "
-                "internal components, DNA double-helix trace curling through one region, assay "
-                "well-plate grid as faint background, gene-expression heatmap blocks in the "
-                "margin; no human skeleton, no full-body anatomy, no garden landscape"
+                "components, DNA double-helix curling through one region, assay well-plate grid "
+                "as faint background pattern, gene-expression heatmap blocks in the margin; "
+                "no human skeleton, no full-body anatomy, no garden landscape"
             ),
         ),
         # ── Social Science / Economics / Policy ──
@@ -692,11 +838,11 @@ def _infer_topic_visual_scene(
                 "behavior", "survey", "education", "humanities", "politics", "psychology",
             ),
             (
-                "population nodes as circles of varying sizes across the composition, "
-                "social-network edges connecting them, survey response data as clustered bar "
-                "charts rising from each node, policy intervention as a color shift propagating "
-                "through the network, timeline bands marking before-and-after periods; no office "
-                "buildings, no money piles, no portraits, no city skyline"
+                "population nodes as circles of varying sizes across the composition connected "
+                "by social-network edges, survey response data as clustered bar charts rising "
+                "from nodes, a policy intervention shown as a color shift propagating through "
+                "the network, timeline bands marking before-and-after periods at the bottom; "
+                "no office buildings, no money piles, no portraits, no city skyline"
             ),
         ),
         # ── Geomagnetic Storm / Space Weather ──
@@ -709,10 +855,10 @@ def _infer_topic_visual_scene(
             ),
             (
                 "the Sun on the left emitting a coronal mass ejection arc, solar wind streamlines "
-                "flowing rightward toward Earth, Earth's magnetosphere as protective blue magnetic "
-                "field lines bending around the planet, aurora oval glowing near the polar region, "
-                "satellite orbit markers and magnetometer graph traces in the margin; no houses, "
-                "no buildings, no landscape painting"
+                "flowing rightward toward Earth in the center, Earth's magnetosphere as protective "
+                "blue magnetic field lines bending around the planet, aurora oval glowing near the "
+                "polar region, satellite orbit markers and magnetometer graph traces in the margin; "
+                "no houses, no buildings, no landscape painting"
             ),
         ),
         # ── Climate / Earth System / Remote Sensing ──
@@ -725,9 +871,10 @@ def _infer_topic_visual_scene(
             ),
             (
                 "Earth as a blue marble sphere with atmospheric layer bands wrapping around it, "
-                "temperature contour isotherms tracing across the globe, satellite sensor swath "
-                "as a trapezoidal footprint on the surface, carbon flux arrows between land and "
-                "ocean, topographic relief in muted earth tones; no houses, no villages, no roads"
+                "temperature isotherm contours tracing across the globe surface, a satellite "
+                "sensor swath shown as a trapezoidal footprint, carbon flux arrows between land "
+                "and ocean, topographic relief in muted earth tones; no houses, no villages, "
+                "no roads, no travel-poster scenery"
             ),
         ),
         # ── Energy Systems ──
@@ -737,11 +884,11 @@ def _infer_topic_visual_scene(
                 "photovoltaic", "storage system", "grid",
             ),
             (
-                "power grid as an organic network of nodes connected by transmission lines, "
-                "solar panel cells as a geometric blue pattern on one side, wind turbine as "
-                "elegant blades on the other, energy storage as stacked block modules, "
-                "power-flow arrows following grid paths, load-curve chart as a marginal graph; "
-                "no houses as main subject, no residential street, no city skyline"
+                "power grid as an organic network of nodes connected by transmission lines "
+                "spanning the composition, solar panel cells as a geometric blue pattern on one "
+                "side, wind turbine as elegant blades on the other, energy storage as stacked "
+                "block modules below, power-flow arrows following grid paths, load-curve chart "
+                "as marginal graph; no houses as main subject, no residential street, no city skyline"
             ),
         ),
         # ── Systems / Networks / Distributed ──
@@ -753,10 +900,10 @@ def _infer_topic_visual_scene(
                 "architecture", "algorithm", "infrastructure",
             ),
             (
-                "modular computing blocks in a clear layered architecture, routing lines "
-                "connecting them, queue-depth indicators as stack heights, database cylinder "
-                "at the foundation, scheduler lanes as parallel tracks with moving tasks, "
-                "pipeline arrows showing data flow; each block has labeled-looking but "
+                "modular computing blocks in a clear layered architecture with routing lines "
+                "connecting them, queue-depth indicators as stack heights, a database cylinder "
+                "at the foundation, scheduler lanes as parallel tracks with tasks moving along "
+                "them, pipeline arrows showing data flow; each block has labeled-looking but "
                 "unreadable surface detail; no physical buildings, no city networks, no "
                 "circuit-board wallpaper, no glowing dashboards"
             ),
@@ -770,10 +917,10 @@ def _infer_topic_visual_scene(
             ),
             (
                 "a feedback loop as the central motif: state→action→reward→next state drawn "
-                "as a continuous cycle, trajectory curves branching from start to goal regions, "
-                "a policy surface with gradient arrows pointing uphill toward the optimum, "
-                "controller block with input-output signal traces; no human skeleton, no houses, "
-                "no abstract maze"
+                "as a continuous cycle with arrowheads, trajectory curves branching from start "
+                "to goal regions showing exploration paths, a policy surface landscape with "
+                "gradient arrows pointing uphill toward the optimum, controller block with "
+                "input-output signal traces; no human skeleton, no houses, no abstract maze"
             ),
         ),
         # ── Chemistry ──
@@ -783,11 +930,12 @@ def _infer_topic_visual_scene(
                 "reaction", "synthesis", "molecular interaction", "spectroscopy",
             ),
             (
-                "a molecular structure as central sculptural form — ball-and-stick model with "
-                "bond angles, two molecules approaching with a dashed transition-state line, "
-                "reaction pathway as arched arrows from reactants to products, energy profile "
-                "curve beneath showing activation barrier and exothermic drop, spectroscopy "
-                "trace as marginal graph; no kitchen, no medicine bottles, no floral patterns"
+                "a molecular structure as the central sculptural form — ball-and-stick model "
+                "with visible bond angles, two molecules approaching with a dashed transition-state "
+                "line between them, reaction pathway as arched arrows from reactants to products, "
+                "energy profile curve beneath showing activation barrier and exothermic drop, "
+                "spectroscopy trace as marginal graph; no kitchen, no medicine bottles, no "
+                "random bubbles, no floral patterns"
             ),
         ),
         # ── Mathematics ──
@@ -800,9 +948,10 @@ def _infer_topic_visual_scene(
             (
                 "a geometric proof construction as the central subject — triangle with auxiliary "
                 "construction lines in dashed strokes, circle with inscribed polygons and secant "
-                "lines, algebraic symbol fragments as abstract calligraphic marks, matrix grid "
-                "with highlighted entries, probability distribution as a smooth bell curve with "
-                "shaded tails; no buildings, no books as main subject, no chalkboard classroom"
+                "lines, algebraic symbol fragments as abstract calligraphic marks arranged like "
+                "an architectural blueprint, matrix grid with highlighted entries, probability "
+                "distribution as a smooth bell curve with shaded tail regions; no buildings, "
+                "no books as main subject, no chalkboard classroom"
             ),
         ),
         # ── Law ──
@@ -813,10 +962,11 @@ def _infer_topic_visual_scene(
             ),
             (
                 "legal documents as layered paper planes with colored citation threads connecting "
-                "passages, a balance scale as the central weighing metaphor tilting slightly, "
-                "regulation flowchart as tributary streams merging into a main channel, case "
-                "timeline as a horizontal band with decision points, institutional seal-like "
-                "circular mark; no courthouse building, no judge portrait, no prison"
+                "passages across documents, a balance scale as the central weighing metaphor with "
+                "one side tilting slightly, regulation flowchart as tributary streams merging into "
+                "a main channel, case timeline as a horizontal band with marked decision points, "
+                "an institutional seal-like abstract circular mark; no courthouse building as "
+                "main scene, no judge portrait, no prison, no city street"
             ),
         ),
         # ── Agriculture ──
@@ -828,9 +978,10 @@ def _infer_topic_visual_scene(
             (
                 "crop rows receding in perspective across the upper composition, a soil "
                 "cross-section cutaway at the bottom revealing distinct horizon layers with "
-                "root systems penetrating downward, irrigation water flow as blue dashed lines, "
-                "sensor-marker icons at sampling points, yield bar chart in the margin; "
-                "no farmhouse, no barn, no rural sunset landscape"
+                "root systems penetrating downward, irrigation water flow as blue dashed lines "
+                "between rows, small sensor-marker icons at sampling points, yield prediction "
+                "bar chart in the margin comparing treatments; no farmhouse, no barn, no rural "
+                "sunset landscape, no decorative plants without research context"
             ),
         ),
     ]
@@ -842,14 +993,14 @@ def _infer_topic_visual_scene(
     # ── Fallbacks ──
     if "agent" in text or "tool" in text or "智能体" in text:
         return (
-            "an AI agent workflow as interconnected tool nodes with planning arrows, central "
-            "reasoning block connected to document icons, code snippets, and database symbols, "
-            "execution traces as step-by-step horizontal lanes"
+            "an AI agent workflow as interconnected tool nodes with planning arrows radiating "
+            "from a central reasoning block, connected to document icons, code snippets, and "
+            "database symbols, execution traces as step-by-step horizontal lanes"
         )
     return (
-        "the core concept rendered as a meaningful abstract composition — domain-relevant "
-        "symbolic objects, data-flow arrows connecting key ideas, clean editorial diagram "
-        "capturing the research contribution"
+        "the core concept rendered as a meaningful abstract composition with domain-relevant "
+        "symbolic objects connected by data-flow arrows, clean editorial diagram capturing "
+        "the research contribution"
     )
 
 
