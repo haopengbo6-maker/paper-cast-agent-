@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PaperCast Radio | 论文电台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;0,800;1,400&family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@400;500;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -24,9 +27,10 @@
   --warn: #8d672d;
   --radius: 8px;
   --shadow: 10px 12px 0 #120c09;
-  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Times New Roman", serif;
-  --font-body: "Aptos", "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
-  --font-mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  --font-display: "ZCOOL XiaoWei", "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", "Iowan Old Style", "Times New Roman", serif;
+  --font-body: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "Microsoft YaHei", "PingFang SC", serif;
+  --font-ui: "Noto Sans SC", "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
 }
 
 html { scroll-behavior: smooth; }
@@ -236,10 +240,13 @@ button, input { font: inherit; }
 .hero-note {
   max-width: 30ch;
   margin: 34px 0 0;
-  color: #7a5b45;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  line-height: 1.6;
+  color: #6f5440;
+  font-family: var(--font-display);
+  font-size: clamp(0.98rem, 1.1vw, 1.08rem);
+  line-height: 1.95;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-wrap: pretty;
 }
 
 .hero-page-label,
@@ -360,8 +367,9 @@ button, input { font: inherit; }
   gap: 10px;
   padding: 0 18px;
   border-bottom: 1px solid rgb(255 240 204 / 0.18);
-  font-weight: 800;
-  font-family: var(--font-mono);
+  font-weight: 900;
+  font-family: var(--font-ui);
+  letter-spacing: 0.04em;
   background: rgb(69 50 39 / 0.76);
   position: relative;
   z-index: 1;
@@ -383,10 +391,12 @@ button, input { font: inherit; }
   border-radius: 0;
   background: rgb(75 53 41 / 0.7);
   color: #f8e2bd;
-  line-height: 1.75;
+  line-height: 1.85;
+  font-size: 0.96rem;
   position: relative;
   z-index: 1;
   font-family: var(--font-body);
+  font-weight: 500;
 }
 
 .coffee-menu {
@@ -419,7 +429,7 @@ button, input { font: inherit; }
   border-radius: 0;
   background: #f2d7a6;
   color: #563520;
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
   font-weight: 800;
 }
 
@@ -440,11 +450,11 @@ button, input { font: inherit; }
 .intro-copy {
   padding: 22px 28px 0;
   margin: 0;
-  font-size: clamp(1.02rem, 1.35vw, 1.32rem);
-  line-height: 1.8;
-  font-weight: 700;
+  font-size: clamp(1rem, 1.18vw, 1.16rem);
+  line-height: 1.95;
+  font-weight: 500;
   color: #fff2d7;
-  max-width: 34em;
+  max-width: 36em;
   text-wrap: pretty;
   position: relative;
   z-index: 1;
@@ -499,7 +509,7 @@ button, input { font: inherit; }
   content: "portable receiver";
   margin-left: 8px;
   color: #7b5c46;
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
   font-size: 0.78rem;
 }
 
@@ -769,7 +779,7 @@ button, input { font: inherit; }
   right: 12px;
   top: 10px;
   color: #725946;
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
   font-size: 15px;
   letter-spacing: 7px;
   line-height: 16px;
@@ -794,7 +804,7 @@ button, input { font: inherit; }
   content: "REC";
   margin-right: 8px;
   color: #ffd9bd;
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
   font-size: 0.76rem;
 }
 .pixel-btn:hover { filter: brightness(1.05); transform: translateY(-2px); }
@@ -845,7 +855,7 @@ button, input { font: inherit; }
 
 .status-chip-item b {
   color: #fff4dc;
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
   font-size: 0.8rem;
 }
 
@@ -993,7 +1003,7 @@ button, input { font: inherit; }
 .summary-item span {
   display: block;
   color: #86664d;
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
   font-size: 0.78rem;
   margin-bottom: 4px;
 }
@@ -1231,7 +1241,7 @@ button, input { font: inherit; }
   display: block;
   margin-bottom: 12px;
   color: #9d4f35;
-  font-family: "Cascadia Mono", Consolas, monospace;
+  font-family: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
   font-weight: 800;
 }
 
@@ -1474,9 +1484,9 @@ button, input { font: inherit; }
       <div>
         <p class="hero-kicker">PAPERCAST CATALOGUE / RESEARCH PLATES</p>
         <h1 class="hero-title">论文的<span>声音图录</span></h1>
-        <p class="hero-copy">上传一篇论文，PaperCast 会把 PDF、摘要、脚本、封面和音频整理成一组可以聆听、阅读和收藏的中文研究图录。</p>
+        <p class="hero-copy">放入一篇论文，PaperCast 将原文、摘要、播报稿、主题封面与语音整理为一页可听、可读、可收藏的中文研究图录。</p>
       </div>
-      <p class="hero-note">这页现在被当作一本画册的跨页来设计：左边是目录与说明，右边是图版封面。封面生成也会沿用这套纸面、线条和印刷感。</p>
+      <p class="hero-note">每一次生成都会落成一张研究图版：左侧记录论文来处与处理路径，右侧留下封面、声音与脚本，纸面、线条和印刷感贯穿始终。</p>
     </div>
     <div class="hero-plate-side">
       <div class="hero-art" aria-hidden="true">
@@ -1487,9 +1497,9 @@ button, input { font: inherit; }
 
   <section class="studio-grid" aria-label="论文转播客工作台">
     <div class="readme-panel">
-      <div class="panel-tab">作品录入</div>
-      <p class="intro-copy">把 arXiv、PDF 链接或本地论文放进图录入口，PaperCast 会整理出中文播客脚本，并在完整模式下生成封面和语音。</p>
-      <div class="coffee-note">适合先听一遍，再像翻看展览图录一样慢慢读。快速模式先出文字，完整模式补齐封面和音频。</div>
+      <div class="panel-tab">论文入册</div>
+      <p class="intro-copy">填入 arXiv、PDF 链接或本地论文，系统会先整理中文播报稿；完整模式会继续生成主题封面和语音版本。</p>
+      <div class="coffee-note">快速模式用于先读稿，完整模式用于成稿收藏：封面、音频与脚本会被编排在同一页研究图录中。</div>
 
       <div class="device" id="input-card">
         <div class="device-head">
