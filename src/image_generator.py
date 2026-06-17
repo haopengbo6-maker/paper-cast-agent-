@@ -366,6 +366,89 @@ def _retry_llm_call(llm_client, prompt: str, max_tokens: int, attempts: int = 2)
     )
 
 
+# ═══════════════════════════════════════════════════════════════════
+#  Dynamic colour palette, composition, and lighting
+# ═══════════════════════════════════════════════════════════════════
+
+# Keyword → colour mood mapping
+_KEYWORD_COLOR_MAP: dict[str, str] = {
+    # Warm / earth
+    "robot": "warm amber and deep umber accents",
+    "manipulation": "warm amber and deep umber accents",
+    "locomotion": "warm amber and deep umber accents",
+    "agriculture": "olive green and ochre with clay undertones",
+    "crop": "olive green and ochre with clay undertones",
+    "soil": "olive green and brown ochre with terracotta accents",
+    "climate": "atmospheric teal and slate blue with muted coral",
+    "environmental": "atmospheric teal and slate blue with muted coral",
+    "forest": "deep forest green with amber highlights",
+    # Cool / deep
+    "space": "deep indigo and cold silver with faint nebula cyan",
+    "astronomy": "deep indigo and cold silver with faint nebula cyan",
+    "physics": "deep navy and crisp white with soft gold accents",
+    "quantum": "deep navy and crisp white with soft gold accents",
+    "optics": "deep navy and crisp white with soft gold accents",
+    "ocean": "dark teal and seafoam with warm sand highlights",
+    "marine": "dark teal and seafoam with warm sand highlights",
+    "water": "dark teal and seafoam with warm sand highlights",
+    # Biomedical
+    "medical": "clinical ivory and slate grey with muted red accents",
+    "biology": "soft sage green and warm ivory with sepia detail",
+    "protein": "soft sage green and warm ivory with sepia detail",
+    "dna": "cool blue and ivory white with subtle amber markers",
+    "cell": "warm rose and ivory with olive accents",
+    "tumor": "clinical ivory and slate grey with muted red accents",
+    "neuroscience": "warm grey and soft gold with faint violet",
+    "brain": "warm grey and soft gold with faint violet",
+    # Tech / AI
+    "ai": "deep slate and electric blue with copper highlights",
+    "machine learning": "deep slate and electric blue with copper highlights",
+    "deep learning": "deep slate and electric blue with copper highlights",
+    "neural": "deep slate and electric blue with copper highlights",
+    "gpu": "dark charcoal and emerald green with copper accents",
+    "hardware": "dark charcoal and emerald green with copper accents",
+    "data": "cool grey and teal with amber annotation marks",
+    "security": "obsidian black and crimson red with silver accents",
+    "network": "dark indigo and cyan with warm node highlights",
+    # Default palette (matches existing style)
+    "default": "burnt sienna, ochre, indigo ink, and olive green accents",
+}
+
+_COMPOSITIONS = [
+    "strong central subject with generous negative space on all sides, symmetrical balance",
+    "subject weighted to the left third, open space flowing to the right, dynamic imbalance",
+    "diagonal arrangement from lower-left to upper-right, creates forward movement",
+    "subjects arranged in a triangle, stable and grounded",
+    "subject at upper-center with detailed base tapering downward, top-heavy elegance",
+]
+
+_LIGHTING_MODES = [
+    "soft diffused lighting from upper left, gentle shadows, museum-quality illumination",
+    "warm side light raking across the subject, long elegant shadows, dramatic depth",
+    "even ambient light, no harsh shadows, like an overcast studio, refined flatness",
+    "low directional light from above, chiaroscuro depth, scholarly atmosphere",
+]
+
+
+def _pick_color_mood(keywords: list[str], title: str) -> str:
+    """Infer colour palette from keywords and title text."""
+    combined = " ".join(keywords).lower() + " " + title.lower()
+    for key, mood in _KEYWORD_COLOR_MAP.items():
+        if key in combined:
+            return mood
+    return _KEYWORD_COLOR_MAP["default"]
+
+
+def _pick_composition(seed: int) -> str:
+    """Rotate through compositions based on a seed value."""
+    return _COMPOSITIONS[seed % len(_COMPOSITIONS)]
+
+
+def _pick_lighting(seed: int) -> str:
+    """Rotate through lighting modes based on a seed value."""
+    return _LIGHTING_MODES[seed % len(_LIGHTING_MODES)]
+
+
 def _build_cover_prompt_programmatic(
     title: str, keywords_clean: list[str], summary_line: str, script_line: str
 ) -> str:
@@ -407,9 +490,16 @@ def _build_cover_prompt_programmatic(
     else:
         scene = f"academic research illustration about {title[:80]}"
 
+    colour_mood = _pick_color_mood(keywords_clean, title)
+    comp = _pick_composition(len(unique_cues))
+    light = _pick_lighting(len(unique_cues))
+
     parts: list[str] = [
         _QUALITY,
         _STYLE,
+        f"colour mood: {colour_mood}",
+        f"composition: {comp}",
+        f"lighting: {light}",
         f"subject: {scene}",
         f"context: {stage}",
     ]
@@ -758,7 +848,7 @@ def build_sdxl_workflow(checkpoint: str, positive_prompt: str, output_prefix: st
         },
         "5": {
             "class_type": "EmptyLatentImage",
-            "inputs": {"width": 1024, "height": 1024, "batch_size": 1},
+            "inputs": {"width": 1216, "height": 832, "batch_size": 1},
         },
         "6": {
             "class_type": "CLIPTextEncode",
@@ -798,7 +888,7 @@ def build_sdxl_workflow(checkpoint: str, positive_prompt: str, output_prefix: st
 
 
 _NEGATIVE_PROMPT = (
-    "low quality, blurry, jpeg artifacts, watermark, signature, "
+    "low quality, blurry, jpeg artifacts, watermark, signature, artist name, "
     "photorealistic, 3d render, CGI, glossy plastic, metallic chrome, "
     "visible text, letters, typography, Chinese characters, calligraphy, "
     "ancient Chinese painting, ink wash landscape, pagoda, temple, "
@@ -809,7 +899,10 @@ _NEGATIVE_PROMPT = (
     "circuit board texture, neon cyberpunk, sci-fi dashboard, device UI, "
     "many spheres, orbit rings, planets as decoration, fractal pattern, maze, "
     "photograph of a person, portrait, face, selfie, stock photo, "
-    "cluttered composition, busy background, too many objects"
+    "cluttered composition, busy background, too many objects, "
+    "speech bubble, comic panel, multiple panels, split screen, grid layout, "
+    "frame border, ornamental border, logo, badge, emblem, icon set, "
+    "lens flare, bloom glow, overexposed, high contrast, HDR"
 )
 
 

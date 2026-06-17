@@ -43,6 +43,7 @@ from src.utils import (
 )
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 UPLOAD_FOLDER = Path.cwd() / "data" / "uploads"
 UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 

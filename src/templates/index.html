@@ -142,70 +142,37 @@ button, input { font: inherit; }
 }
 
 .hero-board {
-  display: grid;
-  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
-  gap: 0;
-  align-items: stretch;
   margin-bottom: 28px;
-  padding: 0;
+  min-height: 420px;
+  background-size: cover;
+  background-position: center;
   border: 1px solid rgb(61 44 34 / 0.82);
   border-radius: 2px;
-  background:
-    linear-gradient(90deg, rgb(255 250 240 / 0.55) 0 1px, transparent 1px 50%),
-    linear-gradient(180deg, rgb(255 247 231 / 0.96), rgb(238 220 189 / 0.94));
   color: var(--ink);
   box-shadow: 0 18px 36px rgb(37 24 20 / 0.12);
   position: relative;
   overflow: hidden;
-}
-
-.hero-board::before {
-  content: "";
-  position: absolute;
-  inset: 22px;
-  border: 1px solid rgb(109 81 59 / 0.18);
-  pointer-events: none;
+  display: flex; align-items: center;
 }
 
 .hero-board::after {
   content: "";
-  position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: linear-gradient(180deg, transparent, rgb(109 81 59 / 0.28), transparent);
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgb(255 247 231 / 0.3) 0%, rgb(238 220 189 / 0.15) 50%, transparent 100%);
   pointer-events: none;
 }
 
-.hero-copy-side,
-.hero-plate-side {
-  position: relative;
-  min-height: 280px;
-  padding: clamp(28px, 4vw, 48px);
-}
-
-.hero-copy-side {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background:
-    linear-gradient(180deg, rgb(255 248 235 / 0.76), rgb(241 226 196 / 0.92));
-}
-
-.hero-copy-side::after {
-  content: "";
-  position: absolute;
-  inset: auto 34px 28px 34px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgb(109 81 59 / 0.24), transparent);
+.hero-cover {
+  position: relative; z-index: 1;
+  padding: clamp(36px, 6vw, 64px);
+  max-width: 28em;
 }
 
 .hero-kicker {
-  margin: 0 0 22px;
-  color: #7a5b45;
+  margin: 0 0 16px;
+  color: #5c3a28;
   font-family: var(--font-mono);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.16em;
 }
@@ -213,121 +180,30 @@ button, input { font: inherit; }
 .hero-title {
   margin: 0;
   max-width: 8.5ch;
-  color: #241713;
+  color: #1a0e08;
   font-family: var(--font-display);
   font-size: clamp(3.7rem, 9.2vw, 8rem);
   line-height: 0.84;
   font-weight: 900;
   text-wrap: balance;
+  text-shadow: 0 1px 3px rgb(255 245 230 / 0.4);
 }
 
 .hero-title span {
   display: block;
-  color: #8f3f2d;
+  color: #7a2e20;
   font-style: italic;
 }
 
 .hero-copy {
-  max-width: 42ch;
-  margin: 28px 0 0;
-  color: #5f4637;
-  font-size: clamp(1rem, 1.45vw, 1.16rem);
+  max-width: 36ch;
+  margin: 20px 0 0;
+  color: #f5ede0;
+  font-size: clamp(1rem, 1.2vw, 1.12rem);
   line-height: 1.85;
   font-family: var(--font-body);
   text-wrap: pretty;
-}
-
-.hero-note {
-  max-width: 30ch;
-  margin: 34px 0 0;
-  color: #6f5440;
-  font-family: var(--font-display);
-  font-size: clamp(0.98rem, 1.1vw, 1.08rem);
-  line-height: 1.95;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  text-wrap: pretty;
-}
-
-.hero-page-label,
-.hero-plate-caption {
-  color: #8b654e;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.hero-page-label {
-  position: absolute;
-  left: clamp(34px, 5vw, 60px);
-  bottom: 22px;
-}
-
-.hero-spine-mark {
-  position: absolute;
-  right: -0.4rem;
-  top: 50%;
-  color: rgb(109 81 59 / 0.56);
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  transform: translateY(-50%) rotate(-90deg);
-  transform-origin: center;
-}
-
-.hero-plate-side {
-  background:
-    linear-gradient(180deg, rgb(249 240 223 / 0.94), rgb(232 214 182 / 0.95)),
-    #ead2a3;
-}
-
-.hero-art {
-  min-height: 100%;
-  border: 1px solid #3b2a21;
-  border-radius: 0;
-  background:
-    linear-gradient(180deg, rgb(251 242 222 / 0.94), rgb(224 202 165 / 0.92)),
-    #ead2a3;
-  box-shadow: inset 0 0 0 12px rgb(255 250 239 / 0.34), 0 0 0 1px rgb(61 44 34 / 0.24);
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-art::before {
-  content: "";
-  position: absolute;
-  inset: 44px;
-  background:
-    radial-gradient(circle at 18% 62%, #4f8cab 0 6px, transparent 7px),
-    radial-gradient(circle at 72% 34%, #a8523a 0 9px, transparent 10px),
-    radial-gradient(circle at 78% 70%, #a8523a 0 5px, transparent 6px),
-    repeating-linear-gradient(112deg, transparent 0 24px, rgb(37 24 20 / 0.14) 25px 26px, transparent 27px 54px);
-}
-
-.hero-art::after {
-  content: "";
-  position: absolute;
-  left: 60px;
-  right: 58px;
-  top: 154px;
-  height: 154px;
-  border-top: 2px solid #5e9fc3;
-  border-right: 2px solid #c56643;
-  border-radius: 50%;
-  transform: rotate(-7deg);
-  box-shadow: 0 -34px 0 -31px #6b8f71, 0 42px 0 -38px #c56643;
-}
-
-.hero-art-label {
-  position: absolute;
-  left: 28px;
-  bottom: 24px;
-  z-index: 1;
-  color: #5f4637;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
+  text-shadow: 0 1px 4px rgb(0 0 0 / 0.45);
 }
 
 .studio-grid {
@@ -842,7 +718,13 @@ button, input { font: inherit; }
   padding: 18px;
   background: #cdb58e;
 }
-#progress-section { display: none; }
+#progress-section {
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.4s ease;
+}
+#progress-section.revealed {
+  opacity: 1; visibility: visible;
+}
 .progress-bar-outer {
   height: 16px;
   border: 3px solid #2a1d17;
@@ -946,11 +828,13 @@ button, input { font: inherit; }
 /* ── Page 1: Cover (fixed, fills viewport) ── */
 .cover-hero {
   position: fixed; inset: 0; z-index: 0;
-  background: transparent; overflow: visible;
+  background: radial-gradient(ellipse at center, #1e1814 0%, #0f0b09 100%);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
 }
-.cover-hero::before {
-  content: "Plate 01"; position: absolute; left: 24px; top: 14px; z-index: 3;
-  color: rgb(255 250 240 / 0.55); font-family: var(--font-mono);
+.plate-tag {
+  position: absolute; left: 24px; top: 14px; z-index: 3;
+  color: rgb(255 250 240 / 0.5); font-family: var(--font-mono);
   font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; pointer-events: none;
 }
 .cover-hero .image-download {
@@ -962,26 +846,33 @@ button, input { font: inherit; }
   font-family: var(--font-mono); font-size: 0.78rem;
 }
 .cover-hero .image-download:hover { background: #9d4f35; color: #fff7e7; }
+.cover-hero-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  filter: blur(20px) brightness(0.7);
+  transform: scale(1.1);
+}
 .cover-hero-img {
-  transition: opacity 0.8s ease;
-  display: block; width: 100%; height: 120vh;
-  object-fit: cover;
-  mask-image: linear-gradient(to bottom, black 55%, transparent 95%);
-  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 95%);
+  display: block; position: relative; z-index: 1;
+  max-width: min(90vw, 100vh); max-height: 80vh;
+  width: auto; height: auto;
+  margin: 0 auto;
+  object-fit: contain;
+  transition: transform 0.8s ease, opacity 0.8s ease;
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
+.cover-hero-img.transitioning { transform: scale(1.05); opacity: 0.3; }
 .cover-hero.hidden { display: none; }
-
-/* Cover transition: subtle zoom-out as content covers it */
-.cover-hero-img.transitioning {
-  transform: scale(1.05); opacity: 0.3; transition: transform 0.8s ease, opacity 0.8s ease;
-}
 
 .scroll-hint {
   position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 3;
   display: flex; flex-direction: column; align-items: center; gap: 6px;
-  color: rgb(255 250 240 / 0.45); font-family: var(--font-ui); font-size: 0.78rem;
+  color: rgb(255 250 240 / 0.7); font-family: var(--font-ui); font-size: 0.78rem;
   letter-spacing: 0.08em; pointer-events: none;
+  transition: opacity 0.4s ease;
 }
+.scroll-hint.fading { opacity: 0; }
 .scroll-arrow { animation: scroll-bounce 1.6s ease-in-out infinite; font-size: 1.1rem; }
 @keyframes scroll-bounce {
   0%, 100% { transform: translateY(0); opacity: 0.4; }
@@ -990,15 +881,15 @@ button, input { font: inherit; }
 
 /* ── Page 2: slides over the fixed cover ── */
 .broadcast-post {
-  margin-top: 100dvh;
+  margin-top: 90dvh;
   margin-bottom: 90px;
   transition: margin-top 0.5s ease;
   position: relative; z-index: 1;
   background: transparent;
-  border: 4px solid #1b120d;
-  border-radius: 10px;
+  border: none;
+  border-radius: 0;
   color: var(--ink);
-  box-shadow: 12px 14px 0 #1a120e;
+  box-shadow: none;
 }
 .broadcast-post > * { position: relative; z-index: 1; }
 .broadcast-post.no-cover {
@@ -1419,23 +1310,6 @@ button, input { font: inherit; }
   font-family: var(--font-ui);
 }
 
-.confetti-container {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9;
-}
-.confetti-piece {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  animation: confetti-fall 2s ease-out forwards;
-}
-@keyframes confetti-fall {
-  from { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-  to { transform: translateY(100vh) rotate(540deg); opacity: 0; }
-}
-
 /* ── Horizontal info strip (below form) ── */
 .info-strip {
   display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
@@ -1465,10 +1339,6 @@ button, input { font: inherit; }
   .studio-grid,
   .player-layout {
     grid-template-columns: 1fr;
-  }
-  .hero-copy-side,
-  .hero-plate-side {
-    min-height: 0;
   }
   .input-bay,
   .album-side {
@@ -1546,19 +1416,11 @@ button, input { font: inherit; }
     <div class="status-chip">学术播客 · 研究图录</div>
   </nav>
 
-  <section class="hero-board" aria-label="PaperCast 简介">
-    <div class="hero-copy-side">
-      <div>
-        <p class="hero-kicker">PAPERCAST CATALOGUE / RESEARCH PLATES</p>
-        <h1 class="hero-title">论文的<span>声音图录</span></h1>
-        <p class="hero-copy">放入一篇论文，PaperCast 将原文、摘要、播报稿、主题封面与语音整理为一页可听、可读、可收藏的中文研究图录。</p>
-      </div>
-      <p class="hero-note">每一次生成都会落成一张研究图版：左侧记录论文来处与处理路径，右侧留下封面、声音与脚本，纸面、线条和印刷感贯穿始终。</p>
-    </div>
-    <div class="hero-plate-side">
-      <div class="hero-art" aria-hidden="true">
-        <div class="hero-art-label">plate 01 / narrated research object</div>
-      </div>
+  <section class="hero-board" aria-label="PaperCast 简介" style="background-image: url('/api/image?path=data/images/hero_illustration.png')">
+    <div class="hero-cover">
+      <p class="hero-kicker">PAPERCAST CATALOGUE / RESEARCH PLATES</p>
+      <h1 class="hero-title">论文的<span>声音图录</span></h1>
+      <p class="hero-copy">放入一篇论文，选择速览或馆藏模式，一键生成可播、可读、可收藏的中文研究图录。</p>
     </div>
   </section>
 
@@ -1643,7 +1505,9 @@ button, input { font: inherit; }
 
     <!-- Page 1: full-viewport cover, fixed -->
     <div class="cover-hero" id="cover-hero">
+      <div class="cover-hero-bg" id="cover-hero-bg"></div>
       <div id="image-section">
+        <span class="plate-tag">Plate 01</span>
         <img class="cover-hero-img" id="cover-image" alt="播客封面">
         <a class="image-download" id="image-download" href="#" download>保存图版</a>
       </div>
@@ -1727,7 +1591,6 @@ button, input { font: inherit; }
   <span class="sticky-time" id="sticky-time">00:00</span>
 </div>
 
-<div class="confetti-container" id="confetti"></div>
 
 <script>
 const STEPS = [
@@ -1764,12 +1627,13 @@ function setProgress(pct) {
 
 function showSection(id) {
   const el = document.getElementById(id);
-  if (id === 'output-section') { el.classList.add('revealed'); }
+  if (id === 'output-section' || id === 'progress-section') { el.classList.add('revealed'); }
+  else if (id === 'warning-section') { el.style.display = 'flex'; }
   else { el.style.display = 'block'; }
 }
 function hideSection(id) {
   const el = document.getElementById(id);
-  if (id === 'output-section') { el.classList.remove('revealed'); }
+  if (id === 'output-section' || id === 'progress-section') { el.classList.remove('revealed'); }
   else { el.style.display = 'none'; }
 }
 
@@ -1805,20 +1669,6 @@ function setPlateDetails({ title, mode, media }) {
   if (title) document.getElementById('plate-title').textContent = title;
   if (mode) document.getElementById('plate-mode').textContent = mode;
   if (media) document.getElementById('plate-media').textContent = media;
-}
-
-function spawnConfetti() {
-  const container = document.getElementById('confetti');
-  const colors = ['#c33b2f', '#e8dfcb', '#9faf68', '#f2c27d'];
-  for (let i = 0; i < 34; i++) {
-    const piece = document.createElement('div');
-    piece.className = 'confetti-piece';
-    piece.style.left = Math.random() * 100 + '%';
-    piece.style.animationDelay = Math.random() * 0.8 + 's';
-    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-    container.appendChild(piece);
-    setTimeout(() => piece.remove(), 3000);
-  }
 }
 
 function getRequestErrorMessage(err) {
@@ -1874,8 +1724,6 @@ function startPipeline() {
   setProgress(0);
   showSection('progress-section');
   resetResult();
-  showSection('output-section');
-  document.getElementById('script-content').textContent = '正在生成播客...';
   document.getElementById('progress-text').textContent = fastMode ? '速览模式' : '馆藏模式';
   const post = document.querySelector('.broadcast-post');
   const hero = document.getElementById('cover-hero');
@@ -1939,10 +1787,34 @@ function finishWithScript(path) {
   fetch('/api/script?path=' + encodeURIComponent(path))
     .then(r => r.text())
     .then(text => {
-      document.getElementById('script-content').innerHTML = formatScriptParagraphs(text);
       updateResultText(text);
+      streamScript(text);
       scrollToOutput();
     });
+}
+
+function streamScript(text) {
+  const el = document.getElementById('script-content');
+  const cleaned = text.replace(/\[uv_break\]/g, '');
+  const words = cleaned.split('');
+  let i = 0;
+  const chunkSize = 15;
+  el.textContent = '';
+  function tick() {
+    i += chunkSize;
+    el.textContent = words.slice(0, i).join('');
+    if (i < words.length) {
+      requestAnimationFrame(tick);
+    } else {
+      el.style.opacity = '0';
+      el.style.transition = 'opacity 0.2s ease';
+      requestAnimationFrame(() => {
+        el.innerHTML = formatScriptParagraphs(cleaned);
+        el.style.opacity = '1';
+      });
+    }
+  }
+  tick();
 }
 
 function handleSSE(data) {
@@ -1964,8 +1836,6 @@ function handleSSE(data) {
     document.getElementById('tape').classList.remove('active');
     document.getElementById('btn-run').disabled = false;
     showSection('output-section');
-    spawnConfetti();
-
     try {
       const paths = JSON.parse(message);
       if (paths.warnings && paths.warnings.length) {
@@ -2027,9 +1897,13 @@ document.getElementById('local-pdf').addEventListener('change', function() {
     const obs = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         const img = document.getElementById('cover-image');
-        if (img && img.src) {
-          if (e.isIntersecting) { img.classList.remove('transitioning'); }
-          else { img.classList.add('transitioning'); }
+        const hint = document.querySelector('.scroll-hint');
+        if (e.isIntersecting) {
+          if (img && img.src) img.classList.remove('transitioning');
+          if (hint) hint.classList.remove('fading');
+        } else {
+          if (img && img.src) img.classList.add('transitioning');
+          if (hint) hint.classList.add('fading');
         }
       });
     }, { threshold: 0.3 });
@@ -2045,6 +1919,8 @@ function setTranscriptCover(imageUrl) {
   });
   const stickyCover = document.getElementById('sticky-cover');
   if (stickyCover) stickyCover.style.backgroundImage = url;
+  const heroBg = document.getElementById('cover-hero-bg');
+  if (heroBg) heroBg.style.backgroundImage = url;
 }
 
 // ── Sticky audio player (initialized on first audio load) ──
